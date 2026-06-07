@@ -268,6 +268,9 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 
 <script>
 'use strict';
+// ── DOM helper — must be first so all code below can use g() ─────────────────
+const g = id => document.getElementById(id);
+
 const APP_ID        = '3386rHtrRkbWFzxo0gwdh';
 const REDIRECT_URI  = 'https://skimotho.github.io/multisymbols/';
 const AUTH_ENDPOINT = 'https://auth.deriv.com/oauth2/auth';
@@ -813,7 +816,7 @@ function calcStake(list) {
 
 function wsSendBuy(sym, type, stake, rid) {
   if (!ws||ws.readyState!==WebSocket.OPEN){ addLog('WS not open — cannot buy.','err'); return; }
-  ws.send(JSON.stringify({buy:'1',price:Math.ceil(stake*3),parameters:{contract_type:type,currency,underlying_symbol:sym,duration:1,duration_unit:'t',basis:'stake',amount:stake},req_id:rid}));
+  ws.send(JSON.stringify({buy:'1',price:Math.ceil(stake*3),subscribe:1,parameters:{contract_type:type,currency,underlying_symbol:sym,duration:1,duration_unit:'t',basis:'stake',amount:stake},req_id:rid}));
 }
 
 // ── Predetermine ──────────────────────────────────────────────────────────────
@@ -943,7 +946,7 @@ function doStart() {
     g('op-'+sym).innerHTML=''; g('ep-'+sym).innerHTML='';
   });
   wins=0; losses=0; totalPL=0; maxDD=0; startBal=balance;
-  readSettings(); hideAlert(); updateKPIs();
+  readSettings(); hideAlert(); updateKPIs(); lockCfg(true);
   SYMBOLS.forEach(sym=>{updateSymSides(sym);});
   const allSeeded=SYMBOLS.every(sym=>S[sym].digitHistory.length>=HISTORY_SIZE);
   if (!allSeeded) {
@@ -987,11 +990,11 @@ function doStop() {
     unsubscribeFromTicks(sym);
   });
   wsSend({forget_all:'proposal_open_contract'});
+  lockCfg(false);
   addLog('════ Bot STOPPED ════','err'); refreshBtns();
 }
 
 // ── UI render ─────────────────────────────────────────────────────────────────
-const g = id => document.getElementById(id);
 function dot(cls){g('wsDot').className='ws-dot '+cls;}
 function lbl(text){g('wsLabel').textContent=text;}
 function setStatus(s){botState=s;const el=g('sBadge');el.className='sbadge '+s;el.textContent=s.toUpperCase();}
@@ -1007,7 +1010,8 @@ function refreshBtns(){
 function lockCfg(lock){['cfgStake','cfgMF','cfgTP','cfgSL','cfgThreshold','cfgDigitCounter'].forEach(id=>{g(id).disabled=lock;});}
 function alert2(msg,type='error'){
   g('alertIcon').textContent=type==='ok'?'✓':type==='warn'?'ℹ':'⚠';
-  g('alertMsg').textContent=msg;g('alert').className='show '+type;
+  g('alertMsg').textContent=msg;
+  g('alert').className='show'+(type==='ok'?' ok':type==='warn'?' warn':'');
   if(type!=='error') setTimeout(hideAlert,7000);
 }
 function hideAlert(){g('alert').className='';}
