@@ -67,12 +67,13 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .sbadge.reconnecting{background:rgba(59,130,246,.1);color:var(--accent);border:1px solid var(--accent);}
 .sbadge.reconnecting::before{background:var(--accent);animation:pulse 1s infinite;}
 /* Control panel (left sidebar) */
-.control-layout{display:grid;grid-template-columns:300px 1fr;gap:14px;margin-bottom:14px;}
-@media(max-width:900px){.control-layout{grid-template-columns:1fr;}}
-.panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow-sm);overflow:hidden;}
+.control-layout{margin-bottom:14px;}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow-sm);overflow:hidden;display:flex;flex-direction:row;align-items:stretch;min-height:120px;}
+@media(max-width:1100px){.panel{flex-direction:column;}}
 .panel-hd{padding:12px 16px 11px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
 .panel-title{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text2);}
-.oauth-section{padding:14px 16px;border-bottom:1px solid var(--border);}
+.oauth-section{padding:14px 16px;border-right:1px solid var(--border);min-width:240px;display:flex;flex-direction:column;justify-content:center;}
+@media(max-width:1100px){.oauth-section{border-right:none;border-bottom:1px solid var(--border);}}
 .oauth-login-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:10px 18px;border-radius:8px;cursor:pointer;border:1px solid var(--accent);background:var(--accent-glow);color:var(--accent);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;letter-spacing:.5px;text-decoration:none;transition:all var(--transition);}
 .oauth-login-btn:hover{background:rgba(59,130,246,.28);}
 #oauthStatus{font-size:11.5px;color:var(--text3);margin-top:8px;font-family:'DM Mono',monospace;}
@@ -81,14 +82,17 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .acct-badge{padding:3px 9px;border-radius:5px;font-size:10px;font-weight:700;letter-spacing:1px;font-family:'DM Mono',monospace;background:var(--green-bg);color:var(--green);border:1px solid var(--green);white-space:nowrap;}
 .acct-badge.virtual{background:var(--accent-glow);color:var(--accent);border-color:var(--accent);}
 #acctInfo{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.config-section{padding:14px 16px;border-bottom:1px solid var(--border);}
-.cfg-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.config-section{padding:14px 16px;border-right:1px solid var(--border);flex:1;}
+@media(max-width:1100px){.config-section{border-right:none;border-bottom:1px solid var(--border);}}
+.cfg-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;}
+@media(max-width:1400px){.cfg-grid{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:600px){.cfg-grid{grid-template-columns:repeat(2,1fr);}}
 .field label{display:block;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:5px;}
 .field input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-family:'DM Mono',monospace;font-size:12.5px;outline:none;transition:border-color var(--transition);}
 .field input:focus{border-color:var(--accent);}
 @keyframes settingFlash{0%{border-color:var(--green);box-shadow:0 0 0 2px rgba(34,197,94,.25);}100%{border-color:var(--border);box-shadow:none;}}
 .field input.flashed{animation:settingFlash .8s ease-out forwards;}
-.btn-row{padding:14px 16px;display:flex;gap:7px;flex-wrap:wrap;}
+.btn-row{padding:14px 16px;display:flex;gap:7px;flex-wrap:wrap;min-width:320px;align-content:center;flex:1;}
 .btn{flex:1;min-width:0;padding:8px 6px;border-radius:7px;border:1px solid transparent;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:10.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;transition:all var(--transition);white-space:nowrap;}
 .btn:disabled{opacity:.28;cursor:not-allowed;pointer-events:none;}
 .btn-connect{border-color:var(--accent);background:var(--accent-glow);color:var(--accent);}
@@ -98,6 +102,8 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .btn-stop{border-color:var(--red);background:var(--red-bg);color:var(--red);}
 .btn:not(:disabled):hover{filter:brightness(1.18);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.18);}
 /* Global activity log */
+.footer-logs{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px;height:400px;}
+@media(max-width:900px){.footer-logs{grid-template-columns:1fr;height:auto;}}
 .global-log-panel{border-radius:12px;border:1px solid var(--border);background:var(--surface);box-shadow:var(--shadow-sm);display:flex;flex-direction:column;overflow:hidden;height:100%;}
 .log-hd{padding:11px 14px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
 .log-title{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text2);}
@@ -347,9 +353,9 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
     <div class="ob-step" id="ob3"><div class="ob-num">3</div><div class="ob-text">START BOT</div></div>
   </div>
 
-  <!-- Control + Log -->
+  <!-- Control Panel -->
   <div class="control-layout">
-    <div class="panel" style="display:flex;flex-direction:column">
+    <div class="panel">
       <div class="oauth-section" id="oauthLoginSection">
         <a id="oauthLoginBtn" class="oauth-login-btn" href="#" onclick="doOAuthLogin(event)">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
@@ -384,15 +390,43 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
         <button class="btn btn-stop"       id="btnStop"  onclick="doStop()"       disabled>Stop</button>
       </div>
     </div>
+  </div>
+
+  <!-- Symbol cards -->
+  <div class="symbols-section-title">Live Symbol Panels</div>
+  <div class="symbols-grid" id="symbolsGrid">
+    <!-- Cards injected by JS -->
+  </div>
+
+  <!-- Footer Logs -->
+  <div class="footer-logs">
+    <div class="global-log-panel">
+      <div class="log-hd">
+        <span class="log-title">Combined Trade History</span>
+        <button class="log-clear" onclick="clearTradeHistory()">Clear</button>
+      </div>
+      <div id="combinedTradeHistory" style="flex:1;overflow-y:auto;padding:10px 12px;">
+        <table class="hist-table" style="width:100%;font-size:11px;">
+          <thead>
+            <tr>
+              <th style="text-align:left;padding:6px;">Time</th>
+              <th style="text-align:left;padding:6px;">Symbol</th>
+              <th style="text-align:left;padding:6px;">Type</th>
+              <th style="text-align:left;padding:6px;">Stake</th>
+              <th style="text-align:left;padding:6px;">Status</th>
+            </tr>
+          </thead>
+          <tbody id="combinedHistoryBody">
+            <tr><td colspan="5" style="text-align:center;padding:20px;color:var(--text3);">No trades yet</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
     <div class="global-log-panel">
       <div class="log-hd">
         <span class="log-title">Activity Log</span>
         <div style="display:flex;align-items:center;gap:8px">
-          <div class="log-size-btns">
-            <button class="log-size-btn active" id="logSzSm" onclick="setLogSize('sm')">S</button>
-            <button class="log-size-btn" id="logSzMd" onclick="setLogSize('md')">M</button>
-            <button class="log-size-btn" id="logSzLg" onclick="setLogSize('lg')">L</button>
-          </div>
           <button class="log-clear" onclick="clearLog()">Clear</button>
         </div>
       </div>
@@ -403,14 +437,8 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
         <button class="log-filter-btn f-warn" data-filter="warn" onclick="setLogFilter('warn',this)">WARN</button>
         <button class="log-filter-btn" data-filter="info" onclick="setLogFilter('info',this)">INFO</button>
       </div>
-      <div id="globalLog"></div>
+      <div id="globalLog" style="flex:1;min-height:0;"></div>
     </div>
-  </div>
-
-  <!-- Symbol cards -->
-  <div class="symbols-section-title">Live Symbol Panels</div>
-  <div class="symbols-grid" id="symbolsGrid">
-    <!-- Cards injected by JS -->
   </div>
 </div>
 
@@ -592,16 +620,7 @@ function toggleCard(sym) {
   } catch(_){}
 })();
 
-// ── UI #5: Log resize ─────────────────────────────────────────────────────────
-const LOG_SIZES = {sm:'160px', md:'300px', lg:'500px'};
-let currentLogSize = 'sm';
-function setLogSize(sz) {
-  currentLogSize = sz;
-  g('globalLog').style.minHeight = LOG_SIZES[sz];
-  ['sm','md','lg'].forEach(s=>g('logSz'+s[0].toUpperCase()+s.slice(1)).classList.toggle('active', s===sz));
-  localStorage.setItem('digitbot-logsize', sz);
-}
-(function(){ const s=localStorage.getItem('digitbot-logsize')||'sm'; setLogSize(s); })();
+// Log size logic removed as logs are now fixed in footer.
 
 // ── UI #6: Log filter ─────────────────────────────────────────────────────────
 let activeLogFilter = 'all';
@@ -622,6 +641,9 @@ function applyLogFilter(line) {
 }
 function clearLog() {
   g('globalLog').innerHTML = '';
+}
+function clearTradeHistory() {
+  g('combinedHistoryBody').innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--text3);">No trades yet</td></tr>';
 }
 
 // ── UI #7: Toast notifications ────────────────────────────────────────────────
@@ -1441,14 +1463,30 @@ function updateSymSides(sym){
 }
 
 function addHistory(sym,side,result,stake,payout,profit,predicted){
-  const tbody=g('hb-'+sym);
-  const ph=tbody.querySelector('.hist-empty'); if(ph) ph.parentElement.remove();
-  const t=new Date().toTimeString().slice(0,8), tr=document.createElement('tr');
+  const t=new Date().toTimeString().slice(0,8);
   const tc=side==='ODD'?'hist-type-odd':'hist-type-even';
   const sh=result==='WIN'?'<span class="hist-win">'+(predicted?'~':'')+'WIN</span>':'<span class="hist-loss">'+(predicted?'~':'')+'LOSS</span>';
-  tr.innerHTML='<td>'+t+'</td><td class="'+tc+'">'+side+'</td><td>'+stake.toFixed(2)+'</td><td>'+sh+'</td>';
-  tbody.insertBefore(tr,tbody.firstChild);
-  while(tbody.rows.length>100) tbody.deleteRow(tbody.rows.length-1);
+  
+  // Per-symbol history
+  const tbody=g('hb-'+sym);
+  if(tbody){
+    const ph=tbody.querySelector('.hist-empty'); if(ph) ph.parentElement.remove();
+    const tr=document.createElement('tr');
+    tr.innerHTML='<td>'+t+'</td><td class="'+tc+'">'+side+'</td><td>'+stake.toFixed(2)+'</td><td>'+sh+'</td>';
+    tbody.insertBefore(tr,tbody.firstChild);
+    while(tbody.rows.length>100) tbody.deleteRow(tbody.rows.length-1);
+  }
+
+  // Combined history
+  const combinedTbody = g('combinedHistoryBody');
+  if(combinedTbody){
+    if(combinedTbody.innerHTML.includes('No trades yet')) combinedTbody.innerHTML = '';
+    const ctr = document.createElement('tr');
+    ctr.innerHTML = '<td style="padding:6px;">'+t+'</td><td style="padding:6px;font-weight:700;color:var(--accent);">'+sym+'</td><td class="'+tc+'" style="padding:6px;">'+side+'</td><td style="padding:6px;">'+stake.toFixed(2)+'</td><td style="padding:6px;">'+sh+'</td>';
+    combinedTbody.insertBefore(ctr, combinedTbody.firstChild);
+    while(combinedTbody.rows.length>200) combinedTbody.deleteRow(combinedTbody.rows.length-1);
+  }
+
   // toast + sound
   showToast(sym, side, result, stake, profit);
   if(result==='WIN') playTone(880, 0.15);
