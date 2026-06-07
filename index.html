@@ -167,10 +167,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .sym-pl-label{color:var(--text3);font-size:10px;letter-spacing:1px;text-transform:uppercase;}
 .sym-pl-val{font-size:13px;font-weight:500;}
 .sym-pl-val.pos{color:var(--green);}.sym-pl-val.neg{color:var(--red);}
-/* Per-symbol trade history */
-.sym-hist{overflow-y:auto;max-height:140px;}
-.sym-hist::-webkit-scrollbar{width:3px;}
-.sym-hist::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+/* Combined trade history */
 .hist-table{width:100%;border-collapse:collapse;font-family:'DM Mono',monospace;font-size:10.5px;table-layout:fixed;}
 .hist-table th{position:sticky;top:0;z-index:1;background:var(--surface2);padding:5px 6px;font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);text-align:left;}
 .hist-table td{padding:5px 6px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-bottom:1px solid var(--border);}
@@ -591,12 +588,7 @@ function buildSymCards() {
             <div class="sym-chips" id="ec-${sym}"><span class="chip-empty">empty</span></div>
           </div>
         </div>
-        <div class="sym-hist">
-          <table class="hist-table">
-            <thead><tr><th>Time</th><th>Type</th><th>Stake</th><th>Status</th></tr></thead>
-            <tbody id="hb-${sym}"><tr><td colspan="4" class="hist-empty">No trades yet</td></tr></tbody>
-          </table>
-        </div>
+
       </div>`;
     
     if (SYMBOLS_VOL.includes(sym)) {
@@ -1486,15 +1478,7 @@ function addHistory(sym,side,result,stake,payout,profit,predicted){
   const tc=side==='ODD'?'hist-type-odd':'hist-type-even';
   const sh=result==='WIN'?'<span class="hist-win">'+(predicted?'~':'')+'WIN</span>':'<span class="hist-loss">'+(predicted?'~':'')+'LOSS</span>';
   
-  // Per-symbol history
-  const tbody=g('hb-'+sym);
-  if(tbody){
-    const ph=tbody.querySelector('.hist-empty'); if(ph) ph.parentElement.remove();
-    const tr=document.createElement('tr');
-    tr.innerHTML='<td>'+t+'</td><td class="'+tc+'">'+side+'</td><td>'+stake.toFixed(2)+'</td><td>'+sh+'</td>';
-    tbody.insertBefore(tr,tbody.firstChild);
-    while(tbody.rows.length>100) tbody.deleteRow(tbody.rows.length-1);
-  }
+  // Per-symbol history removed as requested.
 
   // Combined history
   const combinedTbody = g('combinedHistoryBody');
