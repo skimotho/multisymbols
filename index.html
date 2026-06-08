@@ -1148,7 +1148,8 @@ function placeSide(sym, side) {
 
 function calcStake(list) {
   if (!list.length) return initStake;
-  return Math.max(initStake, parseFloat((list.reduce((a,b)=>a+b,0)*mFactor).toFixed(2)));
+  const first5 = list.slice(0, 5);
+  return Math.max(initStake, parseFloat((first5.reduce((a,b)=>a+b,0)*mFactor).toFixed(2)));
 }
 
 function wsSendBuy(sym, type, stake, rid) {
@@ -1169,11 +1170,11 @@ function predetermineResult(sym, side, won, digit) {
   s.symPL=parseFloat((s.symPL+profit).toFixed(2));
   updateBotDD();
   if (side==='ODD') {
-    if (won){ s.oddW++; wins++; s.oddList=[]; addLog('[PRE]['+sym+'] ✓ DIGITODD WIN  (digit='+digit+') profit=+'+profit.toFixed(2),'ok'); addHistory(sym,'ODD','WIN',stake,stake+profit,profit,true); }
+    if (won){ s.oddW++; wins++; s.oddList.splice(0,5); addLog('[PRE]['+sym+'] ✓ DIGITODD WIN  (digit='+digit+') profit=+'+profit.toFixed(2)+' | list remaining='+s.oddList.length,'ok'); addHistory(sym,'ODD','WIN',stake,stake+profit,profit,true); }
     else    { s.oddL++; losses++; s.oddList.push(stake); addLog('[PRE]['+sym+'] ✗ DIGITODD LOSS (digit='+digit+') net='+profit.toFixed(2),'err'); addHistory(sym,'ODD','LOSS',stake,0,profit,true); }
     g('op-'+sym).innerHTML=''; s.pendingOdd=null;
   } else {
-    if (won){ s.evenW++; wins++; s.evenList=[]; addLog('[PRE]['+sym+'] ✓ DIGITEVEN WIN  (digit='+digit+') profit=+'+profit.toFixed(2),'ok'); addHistory(sym,'EVEN','WIN',stake,stake+profit,profit,true); }
+    if (won){ s.evenW++; wins++; s.evenList.splice(0,5); addLog('[PRE]['+sym+'] ✓ DIGITEVEN WIN  (digit='+digit+') profit=+'+profit.toFixed(2)+' | list remaining='+s.evenList.length,'ok'); addHistory(sym,'EVEN','WIN',stake,stake+profit,profit,true); }
     else    { s.evenL++; losses++; s.evenList.push(stake); addLog('[PRE]['+sym+'] ✗ DIGITEVEN LOSS (digit='+digit+') net='+profit.toFixed(2),'err'); addHistory(sym,'EVEN','LOSS',stake,0,profit,true); }
     g('ep-'+sym).innerHTML=''; s.pendingEven=null;
   }
