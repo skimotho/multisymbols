@@ -45,8 +45,8 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 #alert.ok{border-color:var(--green);background:var(--green-bg);color:var(--green);}
 .alert-close{margin-left:auto;cursor:pointer;opacity:.6;font-size:15px;}
 /* Global KPI strip */
-.kpi-strip{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin-bottom:14px;}
-@media(max-width:1100px){.kpi-strip{grid-template-columns:repeat(4,1fr)}}
+.kpi-strip{display:grid;grid-template-columns:repeat(8,1fr);gap:10px;margin-bottom:14px;}
+@media(max-width:1200px){.kpi-strip{grid-template-columns:repeat(4,1fr)}}
 @media(max-width:640px){.kpi-strip{grid-template-columns:repeat(2,1fr)}}
 .kpi{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:13px 15px;box-shadow:var(--shadow-sm);}
 .kpi-label{font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--text3);margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -67,12 +67,13 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .sbadge.reconnecting{background:rgba(59,130,246,.1);color:var(--accent);border:1px solid var(--accent);}
 .sbadge.reconnecting::before{background:var(--accent);animation:pulse 1s infinite;}
 /* Control panel (left sidebar) */
-.control-layout{display:grid;grid-template-columns:300px 1fr;gap:14px;margin-bottom:14px;}
-@media(max-width:900px){.control-layout{grid-template-columns:1fr;}}
-.panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow-sm);overflow:hidden;}
+.control-layout{margin-bottom:14px;}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow-sm);overflow:hidden;display:flex;flex-direction:row;align-items:stretch;min-height:120px;}
+@media(max-width:1100px){.panel{flex-direction:column;}}
 .panel-hd{padding:12px 16px 11px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;}
 .panel-title{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text2);}
-.oauth-section{padding:14px 16px;border-bottom:1px solid var(--border);}
+.oauth-section{padding:14px 16px;border-right:1px solid var(--border);min-width:240px;display:flex;flex-direction:column;justify-content:center;}
+@media(max-width:1100px){.oauth-section{border-right:none;border-bottom:1px solid var(--border);}}
 .oauth-login-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:10px 18px;border-radius:8px;cursor:pointer;border:1px solid var(--accent);background:var(--accent-glow);color:var(--accent);font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;letter-spacing:.5px;text-decoration:none;transition:all var(--transition);}
 .oauth-login-btn:hover{background:rgba(59,130,246,.28);}
 #oauthStatus{font-size:11.5px;color:var(--text3);margin-top:8px;font-family:'DM Mono',monospace;}
@@ -81,14 +82,17 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .acct-badge{padding:3px 9px;border-radius:5px;font-size:10px;font-weight:700;letter-spacing:1px;font-family:'DM Mono',monospace;background:var(--green-bg);color:var(--green);border:1px solid var(--green);white-space:nowrap;}
 .acct-badge.virtual{background:var(--accent-glow);color:var(--accent);border-color:var(--accent);}
 #acctInfo{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.config-section{padding:14px 16px;border-bottom:1px solid var(--border);}
-.cfg-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.config-section{padding:14px 16px;border-right:1px solid var(--border);flex:1;}
+@media(max-width:1100px){.config-section{border-right:none;border-bottom:1px solid var(--border);}}
+.cfg-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;}
+@media(max-width:1400px){.cfg-grid{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:600px){.cfg-grid{grid-template-columns:repeat(2,1fr);}}
 .field label{display:block;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:5px;}
 .field input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-family:'DM Mono',monospace;font-size:12.5px;outline:none;transition:border-color var(--transition);}
 .field input:focus{border-color:var(--accent);}
 @keyframes settingFlash{0%{border-color:var(--green);box-shadow:0 0 0 2px rgba(34,197,94,.25);}100%{border-color:var(--border);box-shadow:none;}}
 .field input.flashed{animation:settingFlash .8s ease-out forwards;}
-.btn-row{padding:14px 16px;display:flex;gap:7px;flex-wrap:wrap;}
+.btn-row{padding:14px 16px;display:flex;gap:7px;flex-wrap:wrap;min-width:320px;align-content:center;flex:1;}
 .btn{flex:1;min-width:0;padding:8px 6px;border-radius:7px;border:1px solid transparent;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:10.5px;font-weight:700;letter-spacing:.8px;text-transform:uppercase;transition:all var(--transition);white-space:nowrap;}
 .btn:disabled{opacity:.28;cursor:not-allowed;pointer-events:none;}
 .btn-connect{border-color:var(--accent);background:var(--accent-glow);color:var(--accent);}
@@ -98,6 +102,8 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .btn-stop{border-color:var(--red);background:var(--red-bg);color:var(--red);}
 .btn:not(:disabled):hover{filter:brightness(1.18);transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.18);}
 /* Global activity log */
+.footer-logs{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:14px;height:400px;}
+@media(max-width:900px){.footer-logs{grid-template-columns:1fr;height:auto;}}
 .global-log-panel{border-radius:12px;border:1px solid var(--border);background:var(--surface);box-shadow:var(--shadow-sm);display:flex;flex-direction:column;overflow:hidden;height:100%;}
 .log-hd{padding:11px 14px 10px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
 .log-title{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text2);}
@@ -112,7 +118,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .lm.ok{color:var(--green);}.lm.err{color:var(--red);}.lm.warn{color:var(--yellow);}.lm.info{color:var(--accent);}
 /* ── Symbol grid ── */
 .symbols-section-title{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--text2);margin-bottom:10px;padding-left:2px;}
-.symbols-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:14px;}
+.symbols-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:24px;}
 @media(max-width:1400px){.symbols-grid{grid-template-columns:repeat(3,1fr);}}
 @media(max-width:900px){.symbols-grid{grid-template-columns:repeat(2,1fr);}}
 @media(max-width:560px){.symbols-grid{grid-template-columns:1fr;}}
@@ -161,10 +167,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .sym-pl-label{color:var(--text3);font-size:10px;letter-spacing:1px;text-transform:uppercase;}
 .sym-pl-val{font-size:13px;font-weight:500;}
 .sym-pl-val.pos{color:var(--green);}.sym-pl-val.neg{color:var(--red);}
-/* Per-symbol trade history */
-.sym-hist{overflow-y:auto;max-height:140px;}
-.sym-hist::-webkit-scrollbar{width:3px;}
-.sym-hist::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+/* Combined trade history */
 .hist-table{width:100%;border-collapse:collapse;font-family:'DM Mono',monospace;font-size:10.5px;table-layout:fixed;}
 .hist-table th{position:sticky;top:0;z-index:1;background:var(--surface2);padding:5px 6px;font-size:9px;font-weight:600;letter-spacing:1px;text-transform:uppercase;color:var(--text3);border-bottom:1px solid var(--border);text-align:left;}
 .hist-table td{padding:5px 6px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-bottom:1px solid var(--border);}
@@ -175,6 +178,112 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .hist-empty{text-align:center;padding:20px 0;color:var(--text3);font-size:11px;}
 /* Pending indicator */
 .pend-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--yellow);animation:pulse 1s infinite;margin-left:4px;vertical-align:middle;}
+
+/* ── UI Improvement 1: Digit frequency bar overlay ── */
+.digit-bar-wrap{position:relative;display:inline-block;width:100%;}
+.digit-bar-bg{position:absolute;left:0;top:50%;transform:translateY(-50%);height:12px;border-radius:2px;opacity:.18;pointer-events:none;transition:width .3s ease;}
+.digit-bar-bg.odd-bar{background:var(--accent);}
+.digit-bar-bg.even-bar{background:var(--accent2);}
+.digit-table td.freq-cell{position:relative;min-width:36px;}
+
+/* ── UI Improvement 2: Digit tape strip ── */
+.sym-tape{padding:5px 10px 6px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:3px;overflow:hidden;min-height:28px;}
+.tape-digit{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;border-radius:3px;font-family:'DM Mono',monospace;font-size:10px;font-weight:700;flex-shrink:0;transition:opacity .2s;}
+.tape-digit.even{background:var(--accent2-glow);color:var(--accent2);border:1px solid rgba(249,115,22,.25);}
+.tape-digit.odd{background:var(--accent-glow);color:var(--accent);border:1px solid rgba(59,130,246,.25);}
+.tape-digit.latest{box-shadow:0 0 6px currentColor;opacity:1!important;}
+
+/* ── UI Improvement 3: Win-rate mini donut ── */
+.sym-pl-bar{padding:7px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;font-family:'DM Mono',monospace;font-size:11px;gap:8px;}
+.sym-pl-right{display:flex;align-items:center;gap:8px;}
+.win-donut-wrap{position:relative;width:28px;height:28px;flex-shrink:0;}
+.win-donut-wrap svg{transform:rotate(-90deg);}
+.win-donut-label{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:7px;font-weight:700;color:var(--text2);}
+
+/* ── UI Improvement 4: Collapsible cards ── */
+.sym-card.collapsed .sym-collapse-body{display:none;}
+.sym-card.collapsed .sym-card-hd{border-bottom:none;}
+.sym-collapse-toggle{background:none;border:none;cursor:pointer;color:var(--text3);font-size:13px;padding:2px 4px;transition:color var(--transition),transform .2s;line-height:1;}
+.sym-collapse-toggle:hover{color:var(--text);}
+.sym-card.collapsed .sym-collapse-toggle{transform:rotate(-90deg);}
+.sym-card-hd-inner{display:flex;align-items:center;gap:8px;flex:1;min-width:0;}
+.sym-card-collapsed-summary{display:none;align-items:center;gap:10px;margin-left:auto;flex-shrink:0;}
+.sym-card.collapsed .sym-card-collapsed-summary{display:flex;}
+.sym-collapsed-pl{font-family:'DM Mono',monospace;font-size:11px;font-weight:600;}
+.sym-collapsed-pl.pos{color:var(--green);}.sym-collapsed-pl.neg{color:var(--red);}
+.sym-collapsed-tick{font-family:'DM Mono',monospace;font-size:11px;color:var(--accent);}
+
+/* ── UI Improvement 5: Resizable log ── */
+.log-resize-handle{height:5px;background:var(--border);cursor:row-resize;flex-shrink:0;transition:background .2s;}
+.log-resize-handle:hover{background:var(--accent);}
+.log-size-btns{display:flex;gap:4px;}
+.log-size-btn{background:none;border:1px solid var(--border);border-radius:4px;cursor:pointer;font-size:10px;color:var(--text3);padding:1px 6px;transition:all var(--transition);}
+.log-size-btn:hover,.log-size-btn.active{border-color:var(--accent);color:var(--accent);}
+
+/* ── UI Improvement 6: Log filter tabs ── */
+.log-filters{display:flex;gap:4px;padding:6px 12px;border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap;}
+.log-filter-btn{background:none;border:1px solid var(--border);border-radius:4px;cursor:pointer;font-family:'DM Mono',monospace;font-size:10px;color:var(--text3);padding:2px 8px;letter-spacing:.5px;transition:all var(--transition);}
+.log-filter-btn:hover{border-color:var(--text2);color:var(--text2);}
+.log-filter-btn.active{border-color:var(--accent);color:var(--accent);background:var(--accent-glow);}
+.log-filter-btn.f-ok.active{border-color:var(--green);color:var(--green);background:var(--green-bg);}
+.log-filter-btn.f-err.active{border-color:var(--red);color:var(--red);background:var(--red-bg);}
+.log-filter-btn.f-warn.active{border-color:var(--yellow);color:var(--yellow);background:var(--yellow-bg);}
+.ll.hidden{display:none!important;}
+
+/* ── UI Improvement 7: Toast notifications ── */
+#toastStack{position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column-reverse;gap:8px;z-index:9999;pointer-events:none;}
+.toast{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:9px;font-family:'DM Mono',monospace;font-size:12px;font-weight:500;box-shadow:var(--shadow);pointer-events:auto;animation:toastIn .22s ease;max-width:280px;border:1px solid;}
+@keyframes toastIn{from{opacity:0;transform:translateX(20px);}to{opacity:1;transform:none;}}
+@keyframes toastOut{to{opacity:0;transform:translateX(20px);}}
+.toast.win{background:var(--surface);border-color:var(--green);color:var(--green);}
+.toast.loss{background:var(--surface);border-color:var(--red);color:var(--red);}
+.toast.info-t{background:var(--surface);border-color:var(--accent);color:var(--accent);}
+.toast-sym{font-size:10px;opacity:.7;}
+.toast-close{margin-left:auto;cursor:pointer;opacity:.5;font-size:12px;}
+.toast-close:hover{opacity:1;}
+
+/* ── UI Improvement 8: TP/SL progress bars in KPI ── */
+.kpi-progress{margin-top:7px;display:flex;flex-direction:column;gap:3px;}
+.kpi-prog-row{display:flex;align-items:center;gap:5px;}
+.kpi-prog-label{font-size:9px;letter-spacing:.8px;color:var(--text3);width:14px;flex-shrink:0;}
+.kpi-prog-track{flex:1;height:4px;background:var(--surface2);border-radius:3px;overflow:hidden;border:1px solid var(--border);}
+.kpi-prog-fill{height:100%;border-radius:3px;transition:width .4s ease;}
+.kpi-prog-fill.tp{background:var(--green);}
+.kpi-prog-fill.sl{background:var(--red);}
+
+/* ── UI Improvement 9: Better mobile responsive ── */
+@media(max-width:700px){
+  .control-layout{grid-template-columns:1fr;}
+  .kpi-strip{grid-template-columns:repeat(2,1fr);}
+  .cfg-grid{grid-template-columns:1fr 1fr;}
+  .btn-row{display:grid;grid-template-columns:1fr 1fr;}
+  .btn-row .btn:last-child{grid-column:span 2;}
+  .global-log-panel{min-height:180px;}
+}
+@media(max-width:400px){
+  .cfg-grid{grid-template-columns:1fr;}
+  .btn-row{grid-template-columns:1fr;}
+  .btn-row .btn:last-child{grid-column:span 1;}
+  .kpi-strip{grid-template-columns:1fr;}
+}
+
+/* ── UI Improvement 10: Onboarding steps ── */
+.onboarding-steps{display:flex;gap:0;margin-bottom:4px;}
+.ob-step{display:flex;align-items:center;gap:6px;flex:1;padding:8px 10px;border-radius:0;border:1px solid var(--border);background:var(--surface2);position:relative;transition:all var(--transition);}
+.ob-step:first-child{border-radius:8px 0 0 8px;}
+.ob-step:last-child{border-radius:0 8px 8px 0;}
+.ob-step+.ob-step{border-left:none;}
+.ob-num{width:20px;height:20px;border-radius:50%;background:var(--surface);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:'DM Mono',monospace;font-size:10px;font-weight:700;color:var(--text3);flex-shrink:0;}
+.ob-text{font-size:10px;color:var(--text3);letter-spacing:.5px;}
+.ob-step.active{background:var(--accent-glow);border-color:var(--accent);}
+.ob-step.active .ob-num{background:var(--accent);color:#fff;border-color:var(--accent);}
+.ob-step.active .ob-text{color:var(--accent);}
+.ob-step.done{background:var(--green-bg);border-color:var(--green);}
+.ob-step.done .ob-num{background:var(--green);color:#fff;border-color:var(--green);}
+.ob-step.done .ob-text{color:var(--green);}
+
+/* ── Session timer in KPI ── */
+.kpi-timer{font-family:'DM Mono',monospace;font-size:16px;font-weight:500;color:var(--text);}
 </style>
 </head>
 <body>
@@ -188,6 +297,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
       </div>
     </div>
     <div class="header-right">
+      <button class="theme-btn" id="soundBtn" onclick="toggleSound()" title="Toggle sound alerts">&#128264;</button>
       <button class="theme-btn" id="themeBtn" onclick="toggleTheme()" title="Toggle theme">&#127769;</button>
       <div class="ws-pill">
         <div class="ws-dot" id="wsDot"></div>
@@ -208,14 +318,41 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
     <div class="kpi"><div class="kpi-label">Total P&amp;L</div><div class="kpi-val" id="kPL">0.00</div></div>
     <div class="kpi"><div class="kpi-label">Max Drawdown</div><div class="kpi-val neg" id="kDD">0.00</div></div>
     <div class="kpi"><div class="kpi-label">W / L</div><div class="kpi-val" id="kWL">0 / 0</div></div>
+    <div class="kpi"><div class="kpi-label">Win Rate</div><div class="kpi-val" id="kWR">—</div></div>
     <div class="kpi"><div class="kpi-label">Symbols Ready</div><div class="kpi-val" id="kSymReady">0 / 5</div></div>
-    <div class="kpi"><div class="kpi-label">Take Profit</div><div class="kpi-val" style="color:var(--green)" id="kTP">15000.00</div></div>
-    <div class="kpi"><div class="kpi-label">Status</div><div style="margin-top:5px"><span class="sbadge idle" id="sBadge">IDLE</span></div></div>
+    <div class="kpi">
+      <div class="kpi-label">TP / SL Target</div>
+      <div class="kpi-val" style="color:var(--green);font-size:12px" id="kTP">15000.00</div>
+      <div class="kpi-progress">
+        <div class="kpi-prog-row">
+          <span class="kpi-prog-label">TP</span>
+          <div class="kpi-prog-track"><div class="kpi-prog-fill tp" id="kTPBar" style="width:0%"></div></div>
+        </div>
+        <div class="kpi-prog-row">
+          <span class="kpi-prog-label">SL</span>
+          <div class="kpi-prog-track"><div class="kpi-prog-fill sl" id="kSLBar" style="width:0%"></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="kpi">
+      <div class="kpi-label">Status / Time</div>
+      <div style="margin-top:4px;display:flex;flex-direction:column;gap:4px">
+        <span class="sbadge idle" id="sBadge">IDLE</span>
+        <span class="kpi-timer" id="kTimer">—</span>
+      </div>
+    </div>
   </div>
 
-  <!-- Control + Log -->
+  <!-- Onboarding steps (UI #10) -->
+  <div class="onboarding-steps" id="obSteps">
+    <div class="ob-step active" id="ob1"><div class="ob-num">1</div><div class="ob-text">LOGIN</div></div>
+    <div class="ob-step" id="ob2"><div class="ob-num">2</div><div class="ob-text">CONNECT</div></div>
+    <div class="ob-step" id="ob3"><div class="ob-num">3</div><div class="ob-text">START BOT</div></div>
+  </div>
+
+  <!-- Control Panel -->
   <div class="control-layout">
-    <div class="panel" style="display:flex;flex-direction:column">
+    <div class="panel">
       <div class="oauth-section" id="oauthLoginSection">
         <a id="oauthLoginBtn" class="oauth-login-btn" href="#" onclick="doOAuthLogin(event)">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg>
@@ -239,7 +376,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
           <div class="field"><label>Take Profit</label><input type="number" id="cfgTP" value="15000" min="0" step="1"/></div>
           <div class="field"><label>Stop Loss</label><input type="number" id="cfgSL" value="50000" min="0" step="1"/></div>
           <div class="field"><label>Threshold</label><input type="number" id="cfgThreshold" value="3" min="1" step="1" title="Min streak count for a digit to qualify as a trigger candidate"/></div>
-          <div class="field"><label>Counter Filter</label><input type="number" id="cfgDigitCounter" value="2" min="1" step="1" title="Min number of digits that must be tied at the max streak before a trade triggers"/></div>
+          <div class="field"><label>Counter</label><input type="number" id="cfgDigitCounter" value="2" min="1" step="1" title="Min number of digits that must be tied at the max streak before a trade triggers"/></div>
         </div>
       </div>
       <div class="btn-row">
@@ -250,19 +387,60 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
         <button class="btn btn-stop"       id="btnStop"  onclick="doStop()"       disabled>Stop</button>
       </div>
     </div>
-    <div class="global-log-panel">
-      <div class="log-hd">
-        <span class="log-title">Activity Log</span>
-        <button class="log-clear" onclick="document.getElementById('globalLog').innerHTML=''">Clear</button>
-      </div>
-      <div id="globalLog"></div>
-    </div>
   </div>
 
   <!-- Symbol cards -->
-  <div class="symbols-section-title">Live Symbol Panels</div>
+  <div class="symbols-section-title">Volatility 1s Indices</div>
   <div class="symbols-grid" id="symbolsGrid">
     <!-- Cards injected by JS -->
+  </div>
+
+  <div class="symbols-section-title" style="margin-top:20px">Jump Indices</div>
+  <div class="symbols-grid" id="jumpSymbolsGrid">
+    <!-- Cards injected by JS -->
+  </div>
+
+  <!-- Footer Logs -->
+  <div class="footer-logs">
+    <div class="global-log-panel">
+      <div class="log-hd">
+        <span class="log-title">Combined Trade History</span>
+        <button class="log-clear" onclick="clearTradeHistory()">Clear</button>
+      </div>
+      <div id="combinedTradeHistory" style="flex:1;overflow-y:auto;padding:10px 12px;">
+        <table class="hist-table" style="width:100%;font-size:11px;">
+          <thead>
+            <tr>
+              <th style="text-align:left;padding:6px;">Time</th>
+              <th style="text-align:left;padding:6px;">Symbol</th>
+              <th style="text-align:left;padding:6px;">Type</th>
+              <th style="text-align:left;padding:6px;">Stake</th>
+              <th style="text-align:left;padding:6px;">Status</th>
+            </tr>
+          </thead>
+          <tbody id="combinedHistoryBody">
+            <tr><td colspan="5" style="text-align:center;padding:20px;color:var(--text3);">No trades yet</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="global-log-panel">
+      <div class="log-hd">
+        <span class="log-title">Activity Log</span>
+        <div style="display:flex;align-items:center;gap:8px">
+          <button class="log-clear" onclick="clearLog()">Clear</button>
+        </div>
+      </div>
+      <div class="log-filters">
+        <button class="log-filter-btn active" data-filter="all" onclick="setLogFilter('all',this)">ALL</button>
+        <button class="log-filter-btn f-ok" data-filter="ok" onclick="setLogFilter('ok',this)">TRADES</button>
+        <button class="log-filter-btn f-err" data-filter="err" onclick="setLogFilter('err',this)">ERRORS</button>
+        <button class="log-filter-btn f-warn" data-filter="warn" onclick="setLogFilter('warn',this)">WARN</button>
+        <button class="log-filter-btn" data-filter="info" onclick="setLogFilter('info',this)">INFO</button>
+      </div>
+      <div id="globalLog" style="flex:1;min-height:0;"></div>
+    </div>
   </div>
 </div>
 
@@ -280,7 +458,9 @@ const HISTORY_SIZE  = 200;
 const MAX_RECONNECT = 10;
 const RECONNECT_MS  = 3000;
 
-const SYMBOLS = ['1HZ10V','1HZ25V','1HZ50V','1HZ75V','1HZ100V'];
+const SYMBOLS_VOL = ['1HZ10V','1HZ25V','1HZ50V','1HZ75V','1HZ100V'];
+const SYMBOLS_JUMP = ['JD10','JD25','JD50','JD75','JD100'];
+const SYMBOLS = [...SYMBOLS_VOL, ...SYMBOLS_JUMP];
 
 // ── Per-symbol state factory ───────────────────────────────────────────────────
 function makeSymState(sym) {
@@ -313,7 +493,12 @@ function makeSymState(sym) {
 
 // Global state map: sym -> state object
 const S = {};
-SYMBOLS.forEach(sym => { S[sym] = makeSymState(sym); });
+function initStates() {
+  SYMBOLS.forEach(sym => { 
+    if (!S[sym]) S[sym] = makeSymState(sym); 
+  });
+}
+initStates();
 
 // ── Global shared state ────────────────────────────────────────────────────────
 let ws = null, connected = false, authorized = false;
@@ -331,65 +516,86 @@ let _pingTimer = null;
 
 // ── Build symbol cards ─────────────────────────────────────────────────────────
 function buildSymCards() {
-  const grid = g('symbolsGrid');
+  const volGrid = g('symbolsGrid');
+  const jumpGrid = g('jumpSymbolsGrid');
+  
   SYMBOLS.forEach(sym => {
-    const id = sym.replace(/\./g,'_');
     const card = document.createElement('div');
     card.className = 'sym-card';
     card.id = 'card-'+sym;
     card.innerHTML = `
       <div class="sym-card-hd">
-        <span class="sym-name">${sym}</span>
-        <span class="sym-seed-lbl" id="sl-${sym}">Seeding 0 / ${HISTORY_SIZE}</span>
-      </div>
-      <div class="sym-tick-area">
-        <div class="sym-tick-left">
-          <div class="sym-seed-bar"><div class="sym-seed-fill" id="sf-${sym}" style="width:0%"></div></div>
-          <div class="sym-trigger-info" id="ti-${sym}">Waiting for history seed&hellip;</div>
+        <div class="sym-card-hd-inner">
+          <button class="sym-collapse-toggle" onclick="toggleCard('${sym}')" title="Collapse/expand">&#9660;</button>
+          <span class="sym-name">${sym}</span>
+          <span class="sym-seed-lbl" id="sl-${sym}">Seeding 0 / ${HISTORY_SIZE}</span>
         </div>
-        <div class="sym-tick-right">
-          <div class="sym-tick-val" id="tv-${sym}">&#8212;</div>
-          <div class="sym-tick-digit" id="td-${sym}">last digit: &#8212;</div>
-          <div class="sym-tick-time" id="tt-${sym}">&#8212;</div>
+        <div class="sym-card-collapsed-summary">
+          <span class="sym-collapsed-tick" id="ctv-${sym}">—</span>
+          <span class="sym-collapsed-pl neg" id="cpl-${sym}">0.00</span>
         </div>
       </div>
-      <div class="sym-digit-wrap">
-        <table class="digit-table">
-          <thead><tr><th>D</th><th>Odd</th><th>Even</th><th>Tot</th></tr></thead>
-          <tbody id="db-${sym}"></tbody>
-        </table>
-      </div>
-      <div class="sym-pl-bar">
-        <span class="sym-pl-label">P&amp;L</span>
-        <span class="sym-pl-val" id="spl-${sym}">0.00</span>
-      </div>
-      <div class="sym-sides">
-        <div class="sym-side odd">
-          <div class="sym-side-title">DIGITODD <span id="op-${sym}"></span></div>
-          <div class="sym-side-stats">
-            <span>Stake</span><span>W / L</span>
-            <span class="sym-side-stake" id="os-${sym}">${initStake.toFixed(2)}</span>
-            <span><span class="g" id="ow-${sym}">0</span>/<span class="r" id="ol-${sym}">0</span></span>
+      <div class="sym-collapse-body">
+        <div class="sym-tick-area">
+          <div class="sym-tick-left">
+            <div class="sym-seed-bar"><div class="sym-seed-fill" id="sf-${sym}" style="width:0%"></div></div>
+            <div class="sym-trigger-info" id="ti-${sym}">Waiting for history seed&hellip;</div>
           </div>
-          <div class="sym-chips" id="oc-${sym}"><span class="chip-empty">empty</span></div>
-        </div>
-        <div class="sym-side even">
-          <div class="sym-side-title">DIGITEVEN <span id="ep-${sym}"></span></div>
-          <div class="sym-side-stats">
-            <span>Stake</span><span>W / L</span>
-            <span class="sym-side-stake" id="es-${sym}">${initStake.toFixed(2)}</span>
-            <span><span class="g" id="ew-${sym}">0</span>/<span class="r" id="el-${sym}">0</span></span>
+          <div class="sym-tick-right">
+            <div class="sym-tick-val" id="tv-${sym}">&#8212;</div>
+            <div class="sym-tick-digit" id="td-${sym}">last digit: &#8212;</div>
+            <div class="sym-tick-time" id="tt-${sym}">&#8212;</div>
           </div>
-          <div class="sym-chips" id="ec-${sym}"><span class="chip-empty">empty</span></div>
         </div>
-      </div>
-      <div class="sym-hist">
-        <table class="hist-table">
-          <thead><tr><th>Time</th><th>Type</th><th>Stake</th><th>Status</th></tr></thead>
-          <tbody id="hb-${sym}"><tr><td colspan="4" class="hist-empty">No trades yet</td></tr></tbody>
-        </table>
+        <div class="sym-tape" id="tape-${sym}"></div>
+        <div class="sym-digit-wrap">
+          <table class="digit-table">
+            <thead><tr><th>D</th><th>Odd ▓</th><th>Even ▓</th><th>Tot</th></tr></thead>
+            <tbody id="db-${sym}"></tbody>
+          </table>
+        </div>
+        <div class="sym-pl-bar">
+          <span class="sym-pl-label">P&amp;L</span>
+          <div class="sym-pl-right">
+            <div class="win-donut-wrap" title="Win rate">
+              <svg width="28" height="28" viewBox="0 0 28 28">
+                <circle cx="14" cy="14" r="10" fill="none" stroke="var(--border)" stroke-width="4"/>
+                <circle id="wd-${sym}" cx="14" cy="14" r="10" fill="none" stroke="var(--green)" stroke-width="4"
+                  stroke-dasharray="0 62.83" stroke-linecap="round"/>
+              </svg>
+              <div class="win-donut-label" id="wdl-${sym}">—</div>
+            </div>
+            <span class="sym-pl-val" id="spl-${sym}">0.00</span>
+          </div>
+        </div>
+        <div class="sym-sides">
+          <div class="sym-side odd">
+            <div class="sym-side-title">DIGITODD <span id="op-${sym}"></span></div>
+            <div class="sym-side-stats">
+              <span>Stake</span><span>W / L</span>
+              <span class="sym-side-stake" id="os-${sym}">${initStake.toFixed(2)}</span>
+              <span><span class="g" id="ow-${sym}">0</span>/<span class="r" id="ol-${sym}">0</span></span>
+            </div>
+            <div class="sym-chips" id="oc-${sym}"><span class="chip-empty">empty</span></div>
+          </div>
+          <div class="sym-side even">
+            <div class="sym-side-title">DIGITEVEN <span id="ep-${sym}"></span></div>
+            <div class="sym-side-stats">
+              <span>Stake</span><span>W / L</span>
+              <span class="sym-side-stake" id="es-${sym}">${initStake.toFixed(2)}</span>
+              <span><span class="g" id="ew-${sym}">0</span>/<span class="r" id="el-${sym}">0</span></span>
+            </div>
+            <div class="sym-chips" id="ec-${sym}"><span class="chip-empty">empty</span></div>
+          </div>
+        </div>
+
       </div>`;
-    grid.appendChild(card);
+    
+    if (SYMBOLS_VOL.includes(sym)) {
+      volGrid.appendChild(card);
+    } else {
+      jumpGrid.appendChild(card);
+    }
   });
 }
 buildSymCards();
@@ -409,6 +615,133 @@ function toggleTheme() {
     g('themeBtn').textContent = saved === 'dark' ? '\uD83C\uDF19' : '\u2600\uFE0F';
   });
 })();
+
+// ── UI #4: Collapsible cards ──────────────────────────────────────────────────
+function toggleCard(sym) {
+  const card = g('card-'+sym);
+  card.classList.toggle('collapsed');
+  // save state
+  const collapsed = SYMBOLS.filter(s=>g('card-'+s).classList.contains('collapsed')).map(s=>s);
+  localStorage.setItem('digitbot-collapsed', JSON.stringify(collapsed));
+}
+(function restoreCollapsed(){
+  try {
+    const c = JSON.parse(localStorage.getItem('digitbot-collapsed')||'[]');
+    c.forEach(sym=>{ const el=g('card-'+sym); if(el) el.classList.add('collapsed'); });
+  } catch(_){}
+})();
+
+// Log size logic removed as logs are now fixed in footer.
+
+// ── UI #6: Log filter ─────────────────────────────────────────────────────────
+let activeLogFilter = 'all';
+function setLogFilter(filter, btn) {
+  activeLogFilter = filter;
+  document.querySelectorAll('.log-filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('#globalLog .ll').forEach(line=>{
+    applyLogFilter(line);
+  });
+}
+function applyLogFilter(line) {
+  if (activeLogFilter === 'all') { line.classList.remove('hidden'); return; }
+  const msg = line.querySelector('.lm');
+  const cls = msg ? msg.className : '';
+  const matches = cls.includes(activeLogFilter);
+  line.classList.toggle('hidden', !matches);
+}
+function clearLog() {
+  g('globalLog').innerHTML = '';
+}
+function clearTradeHistory() {
+  g('combinedHistoryBody').innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--text3);">No trades yet</td></tr>';
+}
+
+// ── UI #7: Toast notifications ────────────────────────────────────────────────
+function showToast(sym, side, result, stake, profit) {
+  const stack = g('toastStack');
+  const toast = document.createElement('div');
+  const isWin = result === 'WIN';
+  toast.className = 'toast ' + (isWin ? 'win' : 'loss');
+  const arrow = isWin ? '▲' : '▼';
+  const sign = isWin ? '+' : '';
+  toast.innerHTML =
+    '<span>'+ arrow +' <strong>'+ result +'</strong></span>' +
+    '<span class="toast-sym">'+ sym +' · '+ side +'</span>' +
+    '<span style="margin-left:4px;font-size:11px">'+ sign + profit.toFixed(2) +'</span>' +
+    '<span class="toast-close" onclick="this.parentElement.remove()">✕</span>';
+  stack.appendChild(toast);
+  setTimeout(()=>{
+    toast.style.animation = 'toastOut .22s ease forwards';
+    setTimeout(()=>toast.remove(), 220);
+  }, 3000);
+}
+
+// ── UI #7b: Sound alerts ──────────────────────────────────────────────────────
+let soundEnabled = false;
+let _audioCtx = null;
+function toggleSound() {
+  soundEnabled = !soundEnabled;
+  g('soundBtn').textContent = soundEnabled ? '🔔' : '🔇';
+  g('soundBtn').title = soundEnabled ? 'Sound ON — click to mute' : 'Sound OFF — click to enable';
+}
+function playTone(freq, dur, type='sine') {
+  if (!soundEnabled) return;
+  try {
+    if (!_audioCtx) _audioCtx = new (window.AudioContext||window.webkitAudioContext)();
+    const o = _audioCtx.createOscillator(), g2 = _audioCtx.createGain();
+    o.connect(g2); g2.connect(_audioCtx.destination);
+    o.type = type; o.frequency.value = freq;
+    g2.gain.setValueAtTime(0.15, _audioCtx.currentTime);
+    g2.gain.exponentialRampToValueAtTime(0.001, _audioCtx.currentTime + dur);
+    o.start(); o.stop(_audioCtx.currentTime + dur);
+  } catch(_){}
+}
+
+// ── UI #8: TP/SL progress bars ────────────────────────────────────────────────
+function updateTPSLBars() {
+  const tpPct  = tpTarget  > 0 ? Math.min(100, Math.max(0, (totalPL / tpTarget) * 100))  : 0;
+  const slPct  = slTarget  > 0 ? Math.min(100, Math.max(0, (-totalPL / slTarget) * 100)) : 0;
+  g('kTPBar').style.width = tpPct.toFixed(1) + '%';
+  g('kSLBar').style.width = slPct.toFixed(1) + '%';
+}
+
+// ── UI #10: Onboarding steps ──────────────────────────────────────────────────
+function updateOnboarding() {
+  const hasToken = !!activeToken;
+  const isConn   = connected && authorized;
+  const isActive = botState === 'running' || botState === 'seeding' || botState === 'paused';
+
+  const setState = (id, state) => {
+    const el = g(id); if (!el) return;
+    el.className = 'ob-step ' + state;
+    if (state === 'done') el.querySelector('.ob-num').textContent = '✓';
+  };
+
+  if (!hasToken)      { setState('ob1','active'); setState('ob2',''); setState('ob3',''); }
+  else if (!isConn)   { setState('ob1','done');   setState('ob2','active'); setState('ob3',''); }
+  else if (!isActive) { setState('ob1','done');   setState('ob2','done');   setState('ob3','active'); }
+  else                { setState('ob1','done');   setState('ob2','done');   setState('ob3','done'); }
+}
+
+// ── Session timer ──────────────────────────────────────────────────────────────
+let sessionStart = null, sessionTimerInterval = null;
+function startSessionTimer() {
+  sessionStart = Date.now();
+  if (sessionTimerInterval) clearInterval(sessionTimerInterval);
+  sessionTimerInterval = setInterval(() => {
+    if (botState !== 'running' && botState !== 'seeding' && botState !== 'paused') return;
+    const s = Math.floor((Date.now() - sessionStart) / 1000);
+    const h = String(Math.floor(s/3600)).padStart(2,'0');
+    const m = String(Math.floor((s%3600)/60)).padStart(2,'0');
+    const sec = String(s%60).padStart(2,'0');
+    g('kTimer').textContent = h+':'+m+':'+sec;
+  }, 1000);
+}
+function stopSessionTimer() {
+  if (sessionTimerInterval) { clearInterval(sessionTimerInterval); sessionTimerInterval = null; }
+  g('kTimer').textContent = '—';
+}
 
 // ── OAuth / PKCE ──────────────────────────────────────────────────────────────
 function generateCodeVerifier() {
@@ -753,6 +1086,10 @@ function onTick(msg) {
   g('tv-'+sym).textContent  = q;
   g('td-'+sym).textContent  = 'last digit: '+d;
   g('tt-'+sym).textContent  = new Date(epo*1000).toLocaleTimeString();
+  // update collapsed summary tick
+  const ctv=g('ctv-'+sym); if(ctv) ctv.textContent=q;
+  // update digit tape
+  updateTape(sym,d);
 
   feedDigit(sym,d);
   renderSeedUI(sym); renderDigitTable(sym);
@@ -811,7 +1148,8 @@ function placeSide(sym, side) {
 
 function calcStake(list) {
   if (!list.length) return initStake;
-  return Math.max(initStake, parseFloat((list.reduce((a,b)=>a+b,0)*mFactor).toFixed(2)));
+  const first5 = list.slice(0, 5);
+  return Math.max(initStake, parseFloat((first5.reduce((a,b)=>a+b,0)*mFactor).toFixed(2)));
 }
 
 function wsSendBuy(sym, type, stake, rid) {
@@ -832,11 +1170,11 @@ function predetermineResult(sym, side, won, digit) {
   s.symPL=parseFloat((s.symPL+profit).toFixed(2));
   updateBotDD();
   if (side==='ODD') {
-    if (won){ s.oddW++; wins++; s.oddList=[]; addLog('[PRE]['+sym+'] ✓ DIGITODD WIN  (digit='+digit+') profit=+'+profit.toFixed(2),'ok'); addHistory(sym,'ODD','WIN',stake,stake+profit,profit,true); }
+    if (won){ s.oddW++; wins++; s.oddList.splice(0,5); addLog('[PRE]['+sym+'] ✓ DIGITODD WIN  (digit='+digit+') profit=+'+profit.toFixed(2)+' | list remaining='+s.oddList.length,'ok'); addHistory(sym,'ODD','WIN',stake,stake+profit,profit,true); }
     else    { s.oddL++; losses++; s.oddList.push(stake); addLog('[PRE]['+sym+'] ✗ DIGITODD LOSS (digit='+digit+') net='+profit.toFixed(2),'err'); addHistory(sym,'ODD','LOSS',stake,0,profit,true); }
     g('op-'+sym).innerHTML=''; s.pendingOdd=null;
   } else {
-    if (won){ s.evenW++; wins++; s.evenList=[]; addLog('[PRE]['+sym+'] ✓ DIGITEVEN WIN  (digit='+digit+') profit=+'+profit.toFixed(2),'ok'); addHistory(sym,'EVEN','WIN',stake,stake+profit,profit,true); }
+    if (won){ s.evenW++; wins++; s.evenList.splice(0,5); addLog('[PRE]['+sym+'] ✓ DIGITEVEN WIN  (digit='+digit+') profit=+'+profit.toFixed(2)+' | list remaining='+s.evenList.length,'ok'); addHistory(sym,'EVEN','WIN',stake,stake+profit,profit,true); }
     else    { s.evenL++; losses++; s.evenList.push(stake); addLog('[PRE]['+sym+'] ✗ DIGITEVEN LOSS (digit='+digit+') net='+profit.toFixed(2),'err'); addHistory(sym,'EVEN','LOSS',stake,0,profit,true); }
     g('ep-'+sym).innerHTML=''; s.pendingEven=null;
   }
@@ -947,6 +1285,7 @@ function doStart() {
   });
   wins=0; losses=0; totalPL=0; maxDD=0; startBal=balance;
   readSettings(); hideAlert(); updateKPIs(); lockCfg(true);
+  startSessionTimer();
   SYMBOLS.forEach(sym=>{updateSymSides(sym);});
   const allSeeded=SYMBOLS.every(sym=>S[sym].digitHistory.length>=HISTORY_SIZE);
   if (!allSeeded) {
@@ -990,7 +1329,7 @@ function doStop() {
     unsubscribeFromTicks(sym);
   });
   wsSend({forget_all:'proposal_open_contract'});
-  lockCfg(false);
+  lockCfg(false); stopSessionTimer();
   addLog('════ Bot STOPPED ════','err'); refreshBtns();
 }
 
@@ -1006,6 +1345,7 @@ function refreshBtns(){
   g('btnPause').disabled=!auth||(!active&&botState!=='paused');
   g('btnStop').disabled=!auth||botState==='idle'||botState==='stopped';
   g('btnPause').textContent=botState==='paused'?'Resume':'Pause';
+  updateOnboarding();
 }
 function lockCfg(lock){['cfgStake','cfgMF','cfgTP','cfgSL','cfgThreshold','cfgDigitCounter'].forEach(id=>{g(id).disabled=lock;});}
 function alert2(msg,type='error'){
@@ -1017,8 +1357,9 @@ function alert2(msg,type='error'){
 function hideAlert(){g('alert').className='';}
 function addLog(msg,cls=''){
   const box=g('globalLog'),t=new Date().toTimeString().slice(0,8);
-  const line=document.createElement('div');line.className='ll';
+  const line=document.createElement('div');line.className='ll';line.dataset.cls=cls;
   line.innerHTML='<span class="lt">'+t+'</span><span class="lm '+cls+'">'+msg+'</span>';
+  applyLogFilter(line);
   box.prepend(line);
   while(box.children.length>300) box.removeChild(box.lastChild);
 }
@@ -1031,6 +1372,14 @@ function updateKPIs(){
   g('kWL').textContent=wins+' / '+losses;
   g('kTP').textContent=tpTarget.toFixed(2);
   if(balance!==null) g('kBalance').textContent=balance.toFixed(2)+' '+currency;
+  // win rate
+  const total=wins+losses;
+  const wr=g('kWR');
+  if(total>0){ const pct=((wins/total)*100).toFixed(1); wr.textContent=pct+'%'; wr.className='kpi-val '+(parseFloat(pct)>=50?'pos':'neg'); }
+  else{ wr.textContent='—'; wr.className='kpi-val'; }
+  // TP/SL progress bars
+  updateTPSLBars();
+  updateOnboarding();
 }
 function updateReadyKPI(){
   const ready=SYMBOLS.filter(sym=>S[sym].historySeeded).length;
@@ -1046,16 +1395,21 @@ function renderSeedUI(sym){
 
 function renderDigitTable(sym){
   const s=S[sym], tbody=g('db-'+sym); tbody.innerHTML='';
+  const maxTotal=Math.max(1,...s.digitTotal);
   for(let d=0;d<10;d++){
     const isOdd=s.maxOddDigits.includes(d), isEven=s.maxEvenDigits.includes(d);
     const tr=document.createElement('tr');
     if(isOdd&&isEven) tr.className='row-odd-trigger';
     else if(isOdd)    tr.className='row-odd-trigger';
     else if(isEven)   tr.className='row-even-trigger';
+    const oddPct  = s.digitTotal[d]>0 ? Math.round((s.digitOddCount[d]  / Math.max(1,...s.digitOddCount))  * 100) : 0;
+    const evenPct = s.digitTotal[d]>0 ? Math.round((s.digitEvenCount[d] / Math.max(1,...s.digitEvenCount)) * 100) : 0;
     tr.innerHTML=
       '<td class="digit-num">'+(isOdd||isEven?'▶ ':'')+d+'</td>'+
-      '<td class="'+(isOdd?'best-odd':'')+'">'+s.digitOddCount[d]+'</td>'+
-      '<td class="'+(isEven?'best-even':'')+'">'+s.digitEvenCount[d]+'</td>'+
+      '<td class="freq-cell '+(isOdd?'best-odd':'')+'">'+
+        '<div class="digit-bar-wrap"><div class="digit-bar-bg odd-bar" style="width:'+oddPct+'%"></div>'+s.digitOddCount[d]+'</div></td>'+
+      '<td class="freq-cell '+(isEven?'best-even':'')+'">'+
+        '<div class="digit-bar-wrap"><div class="digit-bar-bg even-bar" style="width:'+evenPct+'%"></div>'+s.digitEvenCount[d]+'</div></td>'+
       '<td>'+s.digitTotal[d]+'</td>';
     tbody.appendChild(tr);
   }
@@ -1071,6 +1425,27 @@ function updateTriggerInfo(sym,d,triggerOdd,triggerEven){
   g('ti-'+sym).textContent=msg;
 }
 
+// ── UI #2: Digit tape ─────────────────────────────────────────────────────────
+const TAPE_LEN = 22;
+function updateTape(sym, d) {
+  const tape = g('tape-'+sym); if (!tape) return;
+  const isEven = d%2===0;
+  // remove 'latest' from previous
+  const prev = tape.querySelector('.latest');
+  if (prev) prev.classList.remove('latest');
+  // prepend new digit
+  const span = document.createElement('span');
+  span.className = 'tape-digit '+(isEven?'even':'odd')+' latest';
+  span.textContent = d;
+  tape.insertBefore(span, tape.firstChild);
+  // trim overflow
+  while (tape.children.length > TAPE_LEN) tape.removeChild(tape.lastChild);
+  // fade older ones
+  Array.from(tape.children).forEach((el,i)=>{
+    el.style.opacity = (1 - i/TAPE_LEN*0.65).toFixed(2);
+  });
+}
+
 function updateSymSides(sym){
   const s=S[sym];
   g('os-'+sym).textContent=calcStake(s.oddList).toFixed(2);
@@ -1084,17 +1459,42 @@ function updateSymSides(sym){
   const plEl=g('spl-'+sym);
   plEl.textContent=(s.symPL>=0?'+':'')+s.symPL.toFixed(2);
   plEl.className='sym-pl-val '+(s.symPL>=0?'pos':'neg');
+  // collapsed summary
+  const cpl=g('cpl-'+sym);
+  if(cpl){ cpl.textContent=(s.symPL>=0?'+':'')+s.symPL.toFixed(2); cpl.className='sym-collapsed-pl '+(s.symPL>=0?'pos':'neg'); }
+  // win-rate donut (combined W/L across both sides)
+  const tw=s.oddW+s.evenW, tl=s.oddL+s.evenL, total=tw+tl;
+  const wd=g('wd-'+sym), wdl=g('wdl-'+sym);
+  if(wd&&total>0){
+    const pct=tw/total;
+    const circ=2*Math.PI*10, dash=pct*circ;
+    wd.setAttribute('stroke-dasharray', dash.toFixed(2)+' '+circ.toFixed(2));
+    wd.setAttribute('stroke', pct>=0.5?'var(--green)':'var(--red)');
+    if(wdl) wdl.textContent=Math.round(pct*100)+'%';
+  } else if(wd){ wd.setAttribute('stroke-dasharray','0 62.83'); if(wdl) wdl.textContent='—'; }
 }
 
 function addHistory(sym,side,result,stake,payout,profit,predicted){
-  const tbody=g('hb-'+sym);
-  const ph=tbody.querySelector('.hist-empty'); if(ph) ph.parentElement.remove();
-  const t=new Date().toTimeString().slice(0,8), tr=document.createElement('tr');
+  const t=new Date().toTimeString().slice(0,8);
   const tc=side==='ODD'?'hist-type-odd':'hist-type-even';
   const sh=result==='WIN'?'<span class="hist-win">'+(predicted?'~':'')+'WIN</span>':'<span class="hist-loss">'+(predicted?'~':'')+'LOSS</span>';
-  tr.innerHTML='<td>'+t+'</td><td class="'+tc+'">'+side+'</td><td>'+stake.toFixed(2)+'</td><td>'+sh+'</td>';
-  tbody.insertBefore(tr,tbody.firstChild);
-  while(tbody.rows.length>100) tbody.deleteRow(tbody.rows.length-1);
+  
+  // Per-symbol history removed as requested.
+
+  // Combined history
+  const combinedTbody = g('combinedHistoryBody');
+  if(combinedTbody){
+    if(combinedTbody.innerHTML.includes('No trades yet')) combinedTbody.innerHTML = '';
+    const ctr = document.createElement('tr');
+    ctr.innerHTML = '<td style="padding:6px;">'+t+'</td><td style="padding:6px;font-weight:700;color:var(--accent);">'+sym+'</td><td class="'+tc+'" style="padding:6px;">'+side+'</td><td style="padding:6px;">'+stake.toFixed(2)+'</td><td style="padding:6px;">'+sh+'</td>';
+    combinedTbody.insertBefore(ctr, combinedTbody.firstChild);
+    while(combinedTbody.rows.length>200) combinedTbody.deleteRow(combinedTbody.rows.length-1);
+  }
+
+  // toast + sound
+  showToast(sym, side, result, stake, profit);
+  if(result==='WIN') playTone(880, 0.15);
+  else               playTone(220, 0.2, 'sawtooth');
 }
 
 // ── OAuth init ────────────────────────────────────────────────────────────────
@@ -1141,7 +1541,8 @@ async function initOAuth(){
 
 initOAuth();
 SYMBOLS.forEach(sym=>{renderSeedUI(sym);renderDigitTable(sym);updateSymSides(sym);});
-updateKPIs(); updateReadyKPI(); refreshBtns();
+updateKPIs(); updateReadyKPI(); refreshBtns(); updateOnboarding();
 </script>
+<div id="toastStack"></div>
 </body>
 </html>
