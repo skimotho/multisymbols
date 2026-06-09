@@ -1148,6 +1148,7 @@ function placeSide(sym, side) {
 
 function calcStake(list) {
   if (!list.length) return initStake;
+  if (list.length === 1) return Math.max(initStake, parseFloat((list[0] * 2.1).toFixed(2)));
   const first5 = list.slice(0, 5);
   return Math.max(initStake, parseFloat((first5.reduce((a,b)=>a+b,0)*mFactor).toFixed(2)));
 }
