@@ -389,7 +389,7 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
       <div class="config-section">
         <div class="panel-title" style="margin-bottom:12px">Bot Settings <span style="font-size:9px;color:var(--green);letter-spacing:1px;font-weight:500">&#9679; SHARED</span></div>
         <div class="cfg-grid">
-          <div class="field"><label>Initial Stake</label><input type="number" id="cfgStake" value="0.35" min="0.35" step="0.01"/></div>
+          <div class="field"><label>Initial Stake</label><input type="number" id="cfgStake" value="0.35" min="0.001" step="0.001"/></div>
           <div class="field"><label>Martingale</label><input type="number" id="cfgMF" value="1.3" min="1.01" step="0.01"/></div>
           <div class="field"><label>Take Profit</label><input type="number" id="cfgTP" value="15000" min="0" step="1"/></div>
           <div class="field"><label>Stop Loss</label><input type="number" id="cfgSL" value="50000" min="0" step="1"/></div>
@@ -1198,17 +1198,19 @@ function placeSide(sym, side) {
 
 // ── Real placement (original logic) ──────────────────────────────────────────
 function placeSideReal(sym, side, s, stake) {
-  if (stake > balance) { alert2('Insufficient balance for '+sym+' '+side+'. Bot paused.'); pauseBot(); return; }
+  // Deriv enforces a 0.35 USD minimum on real accounts — clamp here only
+  const realStake = Math.max(0.35, stake);
+  if (realStake > balance) { alert2('Insufficient balance for '+sym+' '+side+'. Bot paused.'); pauseBot(); return; }
   const contractType = side==='ODD' ? 'DIGITODD' : 'DIGITEVEN';
   const rid = nextRid();
   s.buyCbs[rid] = (cid) => {
-    const pendObj = {cid, stake, settled:false, isSim:false};
+    const pendObj = {cid, stake:realStake, settled:false, isSim:false};
     if (side==='ODD')  { s.pendingOdd=pendObj;  g('op-'+sym).innerHTML='<span class="pend-dot"></span>'; }
     else               { s.pendingEven=pendObj; g('ep-'+sym).innerHTML='<span class="pend-dot"></span>'; }
-    s.cidSide[cid]=side; s.cidStake[cid]=stake; s.cidPrediction[cid]=null; s.cidRemoved[cid]=null;
-    addLog('['+sym+'] ✓ '+contractType+' bought #'+cid+' stake='+stake.toFixed(2),'ok');
+    s.cidSide[cid]=side; s.cidStake[cid]=realStake; s.cidPrediction[cid]=null; s.cidRemoved[cid]=null;
+    addLog('['+sym+'] ✓ '+contractType+' bought #'+cid+' stake='+realStake.toFixed(2),'ok');
   };
-  wsSendBuy(sym, contractType, stake, rid);
+  wsSendBuy(sym, contractType, realStake, rid);
   updateSymSides(sym);
 }
 
@@ -1438,7 +1440,7 @@ function readSettings() {
   const prev={initStake,mFactor,tpTarget,slTarget,triggerThreshold,digitCounterFilter,simThreshold};
   const _f=(id,def)=>{const v=parseFloat(g(id).value);return isNaN(v)?def:v;};
   const _i=(id,def)=>{const v=parseInt(g(id).value,10);return isNaN(v)?def:v;};
-  initStake=Math.max(0.35,_f('cfgStake',0.35));
+  initStake=Math.max(0,_f('cfgStake',0.35));  // raw value stored; real trades enforce 0.35 floor at placement
   mFactor=Math.max(1.01,_f('cfgMF',1.3));
   tpTarget=_f('cfgTP',15000);
   slTarget=_f('cfgSL',50000);
