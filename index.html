@@ -45,8 +45,8 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 #alert.ok{border-color:var(--green);background:var(--green-bg);color:var(--green);}
 .alert-close{margin-left:auto;cursor:pointer;opacity:.6;font-size:15px;}
 /* Global KPI strip */
-.kpi-strip{display:grid;grid-template-columns:repeat(12,1fr);gap:10px;margin-bottom:14px;}
-@media(max-width:1400px){.kpi-strip{grid-template-columns:repeat(6,1fr)}}
+.kpi-strip{display:grid;grid-template-columns:repeat(10,1fr);gap:10px;margin-bottom:14px;}
+@media(max-width:1400px){.kpi-strip{grid-template-columns:repeat(5,1fr)}}
 @media(max-width:900px){.kpi-strip{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:640px){.kpi-strip{grid-template-columns:repeat(2,1fr)}}
 .kpi{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:13px 15px;box-shadow:var(--shadow-sm);}
@@ -85,8 +85,8 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 #acctInfo{font-size:11px;color:var(--text3);font-family:'DM Mono',monospace;margin-top:5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .config-section{padding:14px 16px;border-right:1px solid var(--border);flex:1;}
 @media(max-width:1100px){.config-section{border-right:none;border-bottom:1px solid var(--border);}}
-.cfg-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;}
-@media(max-width:1400px){.cfg-grid{grid-template-columns:repeat(4,1fr);}}
+.cfg-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;}
+@media(max-width:1400px){.cfg-grid{grid-template-columns:repeat(3,1fr);}}
 @media(max-width:600px){.cfg-grid{grid-template-columns:repeat(2,1fr);}}
 .field label{display:block;font-size:10px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text3);margin-bottom:5px;}
 .field input{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:7px;padding:8px 10px;color:var(--text);font-family:'DM Mono',monospace;font-size:12.5px;outline:none;transition:border-color var(--transition);}
@@ -174,9 +174,6 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .hist-table td{padding:5px 6px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-bottom:1px solid var(--border);}
 .hist-table tr:last-child td{border-bottom:none;}
 .hist-type-odd{color:var(--accent);font-weight:500;}.hist-type-even{color:var(--accent2);font-weight:500;}
-.mode-badge{display:inline-flex;align-items:center;padding:1px 6px;border-radius:4px;font-family:'DM Mono',monospace;font-size:9.5px;font-weight:700;letter-spacing:.8px;white-space:nowrap;}
-.mode-badge.sim{background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.4);color:var(--yellow);}
-.mode-badge.real{background:rgba(59,130,246,.13);border:1px solid rgba(59,130,246,.35);color:var(--accent);}
 .hist-win{background:var(--green-bg);color:var(--green);border:1px solid rgba(34,197,94,.2);border-radius:3px;padding:1px 5px;display:inline-block;font-size:10px;}
 .hist-loss{background:var(--red-bg);color:var(--red);border:1px solid rgba(239,68,68,.2);border-radius:3px;padding:1px 5px;display:inline-block;font-size:10px;}
 .hist-empty{text-align:center;padding:20px 0;color:var(--text3);font-size:11px;}
@@ -288,13 +285,6 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 
 /* ── Session timer in KPI ── */
 .kpi-timer{font-family:'DM Mono',monospace;font-size:16px;font-weight:500;color:var(--text);}
-
-.sim-mode-banner{display:none;align-items:center;gap:8px;padding:7px 14px;border-radius:8px;background:rgba(245,158,11,.12);border:1px solid var(--yellow);color:var(--yellow);font-family:'DM Mono',monospace;font-size:11.5px;font-weight:600;letter-spacing:.5px;margin-bottom:10px;}
-.sim-mode-banner.show{display:flex;}
-.sim-pulse{width:7px;height:7px;border-radius:50%;background:var(--yellow);animation:pulse 1s infinite;flex-shrink:0;}
-.hist-sim-tag{background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);color:var(--yellow);border-radius:3px;padding:1px 5px;display:inline-block;font-size:10px;}
-.kpi-val.sim{color:var(--yellow);}
-
 </style>
 </head>
 <body>
@@ -323,18 +313,10 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
     <span class="alert-close" onclick="hideAlert()">&#x2715;</span>
   </div>
 
-  <!-- Simulation mode banner -->
-  <div class="sim-mode-banner" id="simBanner">
-    <div class="sim-pulse"></div>
-    <span>SIMULATION MODE — next stake below threshold. No real trades are being placed.</span>
-  </div>
-
   <!-- Global KPIs -->
   <div class="kpi-strip">
     <div class="kpi"><div class="kpi-label">Balance</div><div class="kpi-val blue" id="kBalance">&#8212;</div></div>
     <div class="kpi"><div class="kpi-label">Total P&amp;L</div><div class="kpi-val" id="kPL">0.00</div></div>
-    <div class="kpi"><div class="kpi-label">Real P&amp;L</div><div class="kpi-val" id="kRealPL">0.00</div></div>
-    <div class="kpi"><div class="kpi-label">Sim P&amp;L</div><div class="kpi-val sim" id="kSimPL">0.00</div></div>
     <div class="kpi"><div class="kpi-label">Max Drawdown</div><div class="kpi-val neg" id="kDD">0.00</div></div>
     <div class="kpi"><div class="kpi-label">W / L</div><div class="kpi-val" id="kWL">0 / 0</div></div>
     <div class="kpi"><div class="kpi-label">Win Rate</div><div class="kpi-val" id="kWR">—</div></div>
@@ -392,13 +374,12 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
       <div class="config-section">
         <div class="panel-title" style="margin-bottom:12px">Bot Settings <span style="font-size:9px;color:var(--green);letter-spacing:1px;font-weight:500">&#9679; SHARED</span></div>
         <div class="cfg-grid">
-          <div class="field"><label>Initial Stake</label><input type="number" id="cfgStake" value="0.35" min="0.001" step="0.001"/></div>
+          <div class="field"><label>Initial Stake</label><input type="number" id="cfgStake" value="0.35" min="0.35" step="0.01"/></div>
           <div class="field"><label>Martingale</label><input type="number" id="cfgMF" value="1.3" min="1.01" step="0.01"/></div>
           <div class="field"><label>Take Profit</label><input type="number" id="cfgTP" value="15000" min="0" step="1"/></div>
           <div class="field"><label>Stop Loss</label><input type="number" id="cfgSL" value="50000" min="0" step="1"/></div>
           <div class="field"><label>Threshold</label><input type="number" id="cfgThreshold" value="3" min="1" step="1" title="Min streak count for a digit to qualify as a trigger candidate"/></div>
           <div class="field"><label>Counter</label><input type="number" id="cfgDigitCounter" value="2" min="1" step="1" title="Min number of digits that must be tied at the max streak before a trade triggers"/></div>
-          <div class="field"><label>Sim Threshold</label><input type="number" id="cfgSimThreshold" value="0.35" min="0" step="0.01" title="Bot runs in simulation (no real trades) when next stake is below this value; switches to real when at or above"/></div>
         </div>
       </div>
       <div class="btn-row">
@@ -436,13 +417,12 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
               <th style="text-align:left;padding:6px;">Time</th>
               <th style="text-align:left;padding:6px;">Symbol</th>
               <th style="text-align:left;padding:6px;">Type</th>
-              <th style="text-align:left;padding:6px;">Mode</th>
               <th style="text-align:left;padding:6px;">Stake</th>
               <th style="text-align:left;padding:6px;">Status</th>
             </tr>
           </thead>
           <tbody id="combinedHistoryBody">
-            <tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text3);">No trades yet</td></tr>
+            <tr><td colspan="5" style="text-align:center;padding:20px;color:var(--text3);">No trades yet</td></tr>
           </tbody>
         </table>
       </div>
@@ -526,7 +506,7 @@ initStates();
 let ws = null, connected = false, authorized = false;
 let botState = 'idle';
 let currency = 'USD', initStake = 0.35, mFactor = 1.3, tpTarget = 15000, slTarget = 50000;
-let triggerThreshold = 3, digitCounterFilter = 2, simThreshold = 0.35;
+let triggerThreshold = 3, digitCounterFilter = 2;
 let balance = null, startBal = null, totalPL = 0, maxDD = 0, wins = 0, losses = 0;
 let reconnectAttempts = 0, reconnectTimer = null;
 let oauthAccounts = [], activeToken = null;
@@ -540,16 +520,6 @@ let _pingTimer = null;
 let globalLossList = [];
 // Per-tick guard: cleared on every new tick arrival; blocks same sym+type within one tick
 const placedThisTick = new Set();
-
-// ── Simulation mode state ─────────────────────────────────────────────────────
-// Separate counters so sim results never pollute real trading stats
-let simMode = false;           // true when calcStake() < simThreshold
-let simTotalPL = 0;
-let simWins = 0, simLosses = 0;
-let simLossList = [];          // martingale list used only during sim mode
-// Pending sim contracts: sym+side -> {stake, settled, won?}
-const simPending = {};         // key: sym+':'+side
-
 
 // ── Build symbol cards ─────────────────────────────────────────────────────────
 function buildSymCards() {
@@ -689,7 +659,7 @@ function clearLog() {
   g('globalLog').innerHTML = '';
 }
 function clearTradeHistory() {
-  g('combinedHistoryBody').innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text3);">No trades yet</td></tr>';
+  g('combinedHistoryBody').innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--text3);">No trades yet</td></tr>';
 }
 
 // ── UI #7: Toast notifications ────────────────────────────────────────────────
@@ -1174,65 +1144,20 @@ function placeSide(sym, side) {
 
   readSettings();
   const s = S[sym];
-
-  // ── Determine mode for this trigger ──────────────────────────────────────
-  // Use the real loss list to compute the stake (so martingale always reflects
-  // real accumulated losses, even while in sim). Sim has its own list for its
-  // own internal martingale tracking.
-  const realStake  = +(calcStake(globalLossList).toFixed(2));
-  const enterSim   = realStake < simThreshold;
-
-  // Update global mode flag and banner
-  if (enterSim !== simMode) {
-    simMode = enterSim;
-    if (simMode) {
-      addLog('⚠ AUTO → SIMULATION MODE (next stake '+realStake.toFixed(2)+' < threshold '+simThreshold.toFixed(2)+')','warn');
-    } else {
-      addLog('✅ AUTO → REAL MODE (next stake '+realStake.toFixed(2)+' ≥ threshold '+simThreshold.toFixed(2)+')','ok');
-    }
-    updateSimBanner();
-  }
-
-  if (enterSim) {
-    placeSideSim(sym, side, s);
-  } else {
-    placeSideReal(sym, side, s, realStake);
-  }
-}
-
-// ── Real placement (original logic) ──────────────────────────────────────────
-function placeSideReal(sym, side, s, stake) {
-  // Deriv enforces a 0.35 USD minimum on real accounts — clamp here only
-  const realStake = Math.max(0.35, stake);
-  if (realStake > balance) { alert2('Insufficient balance for '+sym+' '+side+'. Bot paused.'); pauseBot(); return; }
+  const stake = +(calcStake(globalLossList).toFixed(2));
+  if (stake>balance) { alert2('Insufficient balance for '+sym+' '+side+'. Bot paused.'); pauseBot(); return; }
   const contractType = side==='ODD' ? 'DIGITODD' : 'DIGITEVEN';
   const rid = nextRid();
   s.buyCbs[rid] = (cid) => {
-    const pendObj = {cid, stake:realStake, settled:false, isSim:false};
+    const pendObj = {cid, stake, settled:false};
     if (side==='ODD')  { s.pendingOdd=pendObj;  g('op-'+sym).innerHTML='<span class="pend-dot"></span>'; }
     else               { s.pendingEven=pendObj; g('ep-'+sym).innerHTML='<span class="pend-dot"></span>'; }
-    s.cidSide[cid]=side; s.cidStake[cid]=realStake; s.cidPrediction[cid]=null; s.cidRemoved[cid]=null;
-    addLog('['+sym+'] ✓ '+contractType+' bought #'+cid+' stake='+realStake.toFixed(2),'ok');
+    s.cidSide[cid]=side; s.cidStake[cid]=stake; s.cidPrediction[cid]=null; s.cidRemoved[cid]=null;
+    addLog('['+sym+'] ✓ '+contractType+' bought #'+cid+' stake='+stake.toFixed(2),'ok');
   };
-  wsSendBuy(sym, contractType, realStake, rid);
+  wsSendBuy(sym, contractType, stake, rid);
   updateSymSides(sym);
 }
-
-// ── Simulated placement (no WS buy) ──────────────────────────────────────────
-function placeSideSim(sym, side, s) {
-  const stake = +(calcStake(simLossList).toFixed(2));
-  const contractType = side==='ODD' ? 'DIGITODD' : 'DIGITEVEN';
-  const simKey = sym+':'+side;
-  // If a sim trade for this sym+side is still pending, don't stack another
-  if (simPending[simKey] && !simPending[simKey].settled) return;
-  simPending[simKey] = {stake, settled:false, sym, side};
-  // Show pending indicator
-  if (side==='ODD')  g('op-'+sym).innerHTML='<span class="pend-dot" style="background:var(--yellow)"></span>';
-  else               g('ep-'+sym).innerHTML='<span class="pend-dot" style="background:var(--yellow)"></span>';
-  addLog('[SIM]['+sym+'] '+contractType+' simulated stake='+stake.toFixed(2),'warn');
-  updateSymSides(sym);
-}
-
 
 function calcStake(list) {
   if (!list.length) return initStake;
@@ -1250,14 +1175,6 @@ function wsSendBuy(sym, type, stake, rid) {
 function predetermineResult(sym, side, won, digit) {
   const s = S[sym];
   const pend = side==='ODD' ? s.pendingOdd : s.pendingEven;
-
-  // Check for a pending SIM trade first
-  const simKey = sym+':'+side;
-  const simPend = simPending[simKey];
-  if (simPend && !simPend.settled) {
-    settleSim(sym, side, simPend, won, digit);
-  }
-
   if (!pend||pend.settled) return;
   pend.settled=true;
   if (pend.cid) s.cidPrediction[pend.cid]=won;
@@ -1269,78 +1186,46 @@ function predetermineResult(sym, side, won, digit) {
   if (side==='ODD') {
     if (won){
       s.oddW++; wins++;
-      const { removed, newList } = applyWin(stake, globalLossList);
+      const { removed, newList } = applyWin(stake);
       globalLossList = newList;
       if (pend.cid) s.cidRemoved[pend.cid] = removed;
       addLog('[PRE]['+sym+'] ✓ DIGITODD WIN  (digit='+digit+') profit=+'+profit.toFixed(2)+' removed='+removed.length+' from global list','ok');
-      addHistory(sym,'ODD','WIN',stake,stake+profit,profit,true,false);
+      addHistory(sym,'ODD','WIN',stake,stake+profit,profit,true);
     } else {
       s.oddL++; losses++;
       globalLossList.push(stake);
       addLog('[PRE]['+sym+'] ✗ DIGITODD LOSS (digit='+digit+') net='+profit.toFixed(2)+' globalList.len='+globalLossList.length,'err');
-      addHistory(sym,'ODD','LOSS',stake,0,profit,true,false);
+      addHistory(sym,'ODD','LOSS',stake,0,profit,true);
     }
     g('op-'+sym).innerHTML=''; s.pendingOdd=null;
   } else {
     if (won){
       s.evenW++; wins++;
-      const { removed, newList } = applyWin(stake, globalLossList);
+      const { removed, newList } = applyWin(stake);
       globalLossList = newList;
       if (pend.cid) s.cidRemoved[pend.cid] = removed;
       addLog('[PRE]['+sym+'] ✓ DIGITEVEN WIN  (digit='+digit+') profit=+'+profit.toFixed(2)+' removed='+removed.length+' from global list','ok');
-      addHistory(sym,'EVEN','WIN',stake,stake+profit,profit,true,false);
+      addHistory(sym,'EVEN','WIN',stake,stake+profit,profit,true);
     } else {
       s.evenL++; losses++;
       globalLossList.push(stake);
       addLog('[PRE]['+sym+'] ✗ DIGITEVEN LOSS (digit='+digit+') net='+profit.toFixed(2)+' globalList.len='+globalLossList.length,'err');
-      addHistory(sym,'EVEN','LOSS',stake,0,profit,true,false);
+      addHistory(sym,'EVEN','LOSS',stake,0,profit,true);
     }
     g('ep-'+sym).innerHTML=''; s.pendingEven=null;
   }
   updateSymSides(sym); updateKPIs(); checkTPSL();
 }
 
-// ── Settle a simulated trade ──────────────────────────────────────────────────
-function settleSim(sym, side, simPend, won, digit) {
-  simPend.settled = true;
-  const simKey = sym+':'+side;
-  const stake = simPend.stake;
-  const profit = won ? parseFloat((stake*0.9).toFixed(2)) : parseFloat((-stake).toFixed(2));
-  simTotalPL = parseFloat((simTotalPL + profit).toFixed(2));
-  const contractType = side==='ODD' ? 'DIGITODD' : 'DIGITEVEN';
-  if (won) {
-    simWins++;
-    const { removed, newList } = applyWin(stake, simLossList);
-    simLossList = newList;
-    addLog('[SIM]['+sym+'] ✓ '+contractType+' WIN  (digit='+digit+') sim_profit=+'+profit.toFixed(2),'warn');
-    addHistory(sym, side, 'WIN', stake, stake+profit, profit, true, true);
-  } else {
-    simLosses++;
-    simLossList.push(stake);
-    addLog('[SIM]['+sym+'] ✗ '+contractType+' LOSS (digit='+digit+') sim_net='+profit.toFixed(2),'warn');
-    addHistory(sym, side, 'LOSS', stake, 0, profit, true, true);
-  }
-  // Clear pending indicator only if no real trade is also pending for this side
-  const s = S[sym];
-  const realPend = side==='ODD' ? s.pendingOdd : s.pendingEven;
-  if (!realPend || realPend.settled) {
-    if (side==='ODD') g('op-'+sym).innerHTML='';
-    else              g('ep-'+sym).innerHTML='';
-  }
-  delete simPending[simKey];
-  updateKPIs();
-}
-
-
-// Remove up to 5 oldest entries from the given lossList that are strictly < winStake
-function applyWin(winStake, lossList) {
+// Remove up to 5 oldest entries from globalLossList that are strictly < winStake
+function applyWin(winStake) {
   const removed = [];
   const newList = [];
-  for (let i = 0; i < lossList.length; i++) {
-    if (removed.length < 5 && lossList[i] < winStake) {
-      removed.push(lossList[i]);
+  for (let i = 0; i < globalLossList.length; i++) {
+    if (removed.length < 5 && globalLossList[i] < winStake) {
+      removed.push(globalLossList[i]);
     } else {
-      newList.push(lossList[i]);
+      newList.push(globalLossList[i]);
     }
   }
   return { removed, newList };
@@ -1413,19 +1298,19 @@ function reviseResult(sym, side, stake, won, cid) {
     if (side==='ODD') { s.oddL++; losses++; s.oddW--; wins--; }
     else              { s.evenL++; losses++; s.evenW--; wins--; }
     addLog('⚠ ['+sym+'] REVISED WIN→LOSS '+side+' #'+cid+' stake='+stake.toFixed(2)+' restored='+removed.length,'warn');
-    addHistory(sym, side, 'LOSS', stake, 0, correctProfit, false, false);
+    addHistory(sym, side, 'LOSS', stake, 0, correctProfit, false);
   } else if (!wasWin && won) {
     // Was predicted LOSS (stake pushed) → actually WIN
     // Remove the wrongly pushed stake, then apply win removal
     const idx = globalLossList.lastIndexOf(stake);
     if (idx !== -1) globalLossList.splice(idx, 1);
-    const { removed, newList } = applyWin(stake, globalLossList);
+    const { removed, newList } = applyWin(stake);
     globalLossList = newList;
     s.cidRemoved[cid] = removed;
     if (side==='ODD') { s.oddW++; wins++; s.oddL--; losses--; }
     else              { s.evenW++; wins++; s.evenL--; losses--; }
     addLog('⚠ ['+sym+'] REVISED LOSS→WIN '+side+' #'+cid+' stake='+stake.toFixed(2)+' removed='+removed.length,'warn');
-    addHistory(sym, side, 'WIN', stake, stake+correctProfit, correctProfit, false, false);
+    addHistory(sym, side, 'WIN', stake, stake+correctProfit, correctProfit, false);
   }
   updateSymSides(sym); updateKPIs(); checkTPSL();
 }
@@ -1441,18 +1326,17 @@ function checkTPSL() {
 
 // ── Settings ──────────────────────────────────────────────────────────────────
 function readSettings() {
-  const prev={initStake,mFactor,tpTarget,slTarget,triggerThreshold,digitCounterFilter,simThreshold};
+  const prev={initStake,mFactor,tpTarget,slTarget,triggerThreshold,digitCounterFilter};
   const _f=(id,def)=>{const v=parseFloat(g(id).value);return isNaN(v)?def:v;};
   const _i=(id,def)=>{const v=parseInt(g(id).value,10);return isNaN(v)?def:v;};
-  initStake=Math.max(0,_f('cfgStake',0.35));  // raw value stored; real trades enforce 0.35 floor at placement
+  initStake=Math.max(0.35,_f('cfgStake',0.35));
   mFactor=Math.max(1.01,_f('cfgMF',1.3));
   tpTarget=_f('cfgTP',15000);
   slTarget=_f('cfgSL',50000);
   triggerThreshold=Math.max(1,_i('cfgThreshold',3));
   digitCounterFilter=Math.max(1,_i('cfgDigitCounter',2));
-  simThreshold=Math.max(0,_f('cfgSimThreshold',0.35));
   if (botState==='running'||botState==='seeding') {
-    const map=[['cfgStake',initStake,prev.initStake,'Stake'],['cfgMF',mFactor,prev.mFactor,'Martingale'],['cfgTP',tpTarget,prev.tpTarget,'Take Profit'],['cfgSL',slTarget,prev.slTarget,'Stop Loss'],['cfgThreshold',triggerThreshold,prev.triggerThreshold,'Threshold'],['cfgDigitCounter',digitCounterFilter,prev.digitCounterFilter,'Counter Filter'],['cfgSimThreshold',simThreshold,prev.simThreshold,'Sim Threshold']];
+    const map=[['cfgStake',initStake,prev.initStake,'Stake'],['cfgMF',mFactor,prev.mFactor,'Martingale'],['cfgTP',tpTarget,prev.tpTarget,'Take Profit'],['cfgSL',slTarget,prev.slTarget,'Stop Loss'],['cfgThreshold',triggerThreshold,prev.triggerThreshold,'Threshold'],['cfgDigitCounter',digitCounterFilter,prev.digitCounterFilter,'Counter Filter']];
     map.forEach(([id,cur,old,label])=>{
       if (cur!==old){addLog('⚙ Setting changed: '+label+' '+old+' → '+cur,'warn');const el=g(id);el.classList.remove('flashed');void el.offsetWidth;el.classList.add('flashed');}
     });
@@ -1471,10 +1355,6 @@ function doStart() {
   // Reset single global loss list and per-tick guard
   globalLossList = [];
   placedThisTick.clear();
-  // Reset sim state
-  simTotalPL = 0; simWins = 0; simLosses = 0; simLossList = [];
-  simMode = false;
-  Object.keys(simPending).forEach(k => delete simPending[k]);
   wins=0; losses=0; totalPL=0; maxDD=0; startBal=balance;
   readSettings(); hideAlert(); updateKPIs(); lockCfg(true);
   startSessionTimer();
@@ -1507,7 +1387,6 @@ function doPause() {
 function pauseBot() {
   setStatus('paused'); addLog('Bot PAUSED.','warn');
   placedThisTick.clear();
-  Object.keys(simPending).forEach(k => delete simPending[k]);
   SYMBOLS.forEach(sym=>{
     S[sym].pendingOdd=null; S[sym].pendingEven=null;
     g('op-'+sym).innerHTML=''; g('ep-'+sym).innerHTML='';
@@ -1518,8 +1397,6 @@ function doStop() {
   if (reconnectTimer){clearTimeout(reconnectTimer);reconnectTimer=null;} reconnectAttempts=0;
   setStatus('stopped');
   placedThisTick.clear();
-  Object.keys(simPending).forEach(k => delete simPending[k]);
-  simMode = false;
   SYMBOLS.forEach(sym=>{
     S[sym].pendingOdd=null; S[sym].pendingEven=null;
     g('op-'+sym).innerHTML=''; g('ep-'+sym).innerHTML='';
@@ -1543,9 +1420,8 @@ function refreshBtns(){
   g('btnStop').disabled=!auth||botState==='idle'||botState==='stopped';
   g('btnPause').textContent=botState==='paused'?'Resume':'Pause';
   updateOnboarding();
-  updateSimBanner();
 }
-function lockCfg(lock){['cfgStake','cfgMF','cfgTP','cfgSL','cfgThreshold','cfgDigitCounter','cfgSimThreshold'].forEach(id=>{g(id).disabled=lock;});}
+function lockCfg(lock){['cfgStake','cfgMF','cfgTP','cfgSL','cfgThreshold','cfgDigitCounter'].forEach(id=>{g(id).disabled=lock;});}
 function alert2(msg,type='error'){
   g('alertIcon').textContent=type==='ok'?'✓':type==='warn'?'ℹ':'⚠';
   g('alertMsg').textContent=msg;
@@ -1563,46 +1439,28 @@ function addLog(msg,cls=''){
 }
 
 function updateKPIs(){
-  // Total P&L = real only
   const pl=g('kPL');
   pl.textContent=(totalPL>=0?'+':'')+totalPL.toFixed(2);
   pl.className='kpi-val '+(totalPL>=0?'pos':'neg');
-  // Real P&L
-  const rpl=g('kRealPL');
-  rpl.textContent=(totalPL>=0?'+':'')+totalPL.toFixed(2);
-  rpl.className='kpi-val '+(totalPL>=0?'pos':'neg');
-  // Sim P&L
-  const spl=g('kSimPL');
-  spl.textContent=(simTotalPL>=0?'+':'')+simTotalPL.toFixed(2);
-  spl.className='kpi-val sim '+(simTotalPL>=0?'pos':'neg');
   g('kDD').textContent=maxDD.toFixed(2);
   g('kWL').textContent=wins+' / '+losses;
   g('kTP').textContent=tpTarget.toFixed(2);
   if(balance!==null) g('kBalance').textContent=balance.toFixed(2)+' '+currency;
-  // win rate (real trades only)
+  // win rate
   const total=wins+losses;
   const wr=g('kWR');
   if(total>0){ const pct=((wins/total)*100).toFixed(1); wr.textContent=pct+'%'; wr.className='kpi-val '+(parseFloat(pct)>=50?'pos':'neg'); }
   else{ wr.textContent='—'; wr.className='kpi-val'; }
-  // Next Stake (global real)
+  // Next Stake (global)
   const ns = calcStake(globalLossList);
   const nsEl = g('kNextStake');
   nsEl.textContent = ns.toFixed(2);
   nsEl.className = 'kpi-val ' + (globalLossList.length > 0 ? 'neg' : 'blue');
-  // Loss List size (real)
+  // Loss List size
   g('kLossList').textContent = globalLossList.length;
   // TP/SL progress bars
   updateTPSLBars();
   updateOnboarding();
-  updateSimBanner();
-}
-function updateSimBanner() {
-  const banner = g('simBanner');
-  if (!banner) return;
-  const isRunning = botState === 'running' || botState === 'seeding';
-  const nextStake = calcStake(globalLossList);
-  const inSim = isRunning && nextStake < simThreshold;
-  banner.classList.toggle('show', inSim);
 }
 function updateReadyKPI(){
   const ready=SYMBOLS.filter(sym=>S[sym].historySeeded).length;
@@ -1699,29 +1557,19 @@ function updateSymSides(sym){
   } else if(wd){ wd.setAttribute('stroke-dasharray','0 62.83'); if(wdl) wdl.textContent='—'; }
 }
 
-function addHistory(sym,side,result,stake,payout,profit,predicted,isSim){
+function addHistory(sym,side,result,stake,payout,profit,predicted){
   const t=new Date().toTimeString().slice(0,8);
   const tc=side==='ODD'?'hist-type-odd':'hist-type-even';
-  const modeBadge = isSim
-    ? '<span class="mode-badge sim">SIM</span>'
-    : '<span class="mode-badge real">REAL</span>';
-  const sh=result==='WIN'
-    ? '<span class="hist-win">'+(predicted?'~':'')+'WIN</span>'
-    : '<span class="hist-loss">'+(predicted?'~':'')+'LOSS</span>';
+  const sh=result==='WIN'?'<span class="hist-win">'+(predicted?'~':'')+'WIN</span>':'<span class="hist-loss">'+(predicted?'~':'')+'LOSS</span>';
+  
+  // Per-symbol history removed as requested.
 
   // Combined history
   const combinedTbody = g('combinedHistoryBody');
   if(combinedTbody){
     if(combinedTbody.innerHTML.includes('No trades yet')) combinedTbody.innerHTML = '';
     const ctr = document.createElement('tr');
-    if(isSim) ctr.style.opacity='0.82';
-    ctr.innerHTML =
-      '<td style="padding:6px;">'+t+'</td>'+
-      '<td style="padding:6px;font-weight:700;color:var(--accent);">'+sym+'</td>'+
-      '<td class="'+tc+'" style="padding:6px;">'+side+'</td>'+
-      '<td style="padding:6px;">'+modeBadge+'</td>'+
-      '<td style="padding:6px;">'+stake.toFixed(2)+'</td>'+
-      '<td style="padding:6px;">'+sh+'</td>';
+    ctr.innerHTML = '<td style="padding:6px;">'+t+'</td><td style="padding:6px;font-weight:700;color:var(--accent);">'+sym+'</td><td class="'+tc+'" style="padding:6px;">'+side+'</td><td style="padding:6px;">'+stake.toFixed(2)+'</td><td style="padding:6px;">'+sh+'</td>';
     combinedTbody.insertBefore(ctr, combinedTbody.firstChild);
     while(combinedTbody.rows.length>200) combinedTbody.deleteRow(combinedTbody.rows.length-1);
   }
