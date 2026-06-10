@@ -45,8 +45,9 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 #alert.ok{border-color:var(--green);background:var(--green-bg);color:var(--green);}
 .alert-close{margin-left:auto;cursor:pointer;opacity:.6;font-size:15px;}
 /* Global KPI strip */
-.kpi-strip{display:grid;grid-template-columns:repeat(8,1fr);gap:10px;margin-bottom:14px;}
-@media(max-width:1200px){.kpi-strip{grid-template-columns:repeat(4,1fr)}}
+.kpi-strip{display:grid;grid-template-columns:repeat(10,1fr);gap:10px;margin-bottom:14px;}
+@media(max-width:1400px){.kpi-strip{grid-template-columns:repeat(5,1fr)}}
+@media(max-width:900px){.kpi-strip{grid-template-columns:repeat(3,1fr)}}
 @media(max-width:640px){.kpi-strip{grid-template-columns:repeat(2,1fr)}}
 .kpi{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:13px 15px;box-shadow:var(--shadow-sm);}
 .kpi-label{font-size:10px;letter-spacing:1.2px;text-transform:uppercase;color:var(--text3);margin-bottom:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
@@ -319,6 +320,8 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
     <div class="kpi"><div class="kpi-label">Max Drawdown</div><div class="kpi-val neg" id="kDD">0.00</div></div>
     <div class="kpi"><div class="kpi-label">W / L</div><div class="kpi-val" id="kWL">0 / 0</div></div>
     <div class="kpi"><div class="kpi-label">Win Rate</div><div class="kpi-val" id="kWR">—</div></div>
+    <div class="kpi"><div class="kpi-label">Next Stake</div><div class="kpi-val blue" id="kNextStake">—</div></div>
+    <div class="kpi"><div class="kpi-label">Loss List</div><div class="kpi-val" id="kLossList">0</div></div>
     <div class="kpi"><div class="kpi-label">Symbols Ready</div><div class="kpi-val" id="kSymReady">0 / 5</div></div>
     <div class="kpi">
       <div class="kpi-label">TP / SL Target</div>
@@ -475,15 +478,14 @@ function makeSymState(sym) {
     maxOddDigits:  [],
     maxEvenDigits: [],
     pipSize: 0,
-    // per-side martingale
+    // pending contracts (multiple per symbol per side possible across ticks)
     pendingOdd:  null,
     pendingEven: null,
-    oddList: [], evenList: [],
     oddW: 0, oddL: 0, evenW: 0, evenL: 0,
     // per-symbol P&L
     symPL: 0,
     // tracking maps
-    cidSide: {}, cidStake: {}, cidPrediction: {},
+    cidSide: {}, cidStake: {}, cidPrediction: {}, cidRemoved: {},
     settledCids: new Set(),
     buyCbs: {},
     tickSubId: null,
@@ -513,6 +515,11 @@ const nextRid = () => _rid++;
 let _txDebugCount = 0;
 let pocSubs = {};
 let _pingTimer = null;
+
+// Single global loss list shared across all symbols and contract types
+let globalLossList = [];
+// Per-tick guard: cleared on every new tick arrival; blocks same sym+type within one tick
+const placedThisTick = new Set();
 
 // ── Build symbol cards ─────────────────────────────────────────────────────────
 function buildSymCards() {
@@ -572,8 +579,7 @@ function buildSymCards() {
           <div class="sym-side odd">
             <div class="sym-side-title">DIGITODD <span id="op-${sym}"></span></div>
             <div class="sym-side-stats">
-              <span>Stake</span><span>W / L</span>
-              <span class="sym-side-stake" id="os-${sym}">${initStake.toFixed(2)}</span>
+              <span>W / L</span>
               <span><span class="g" id="ow-${sym}">0</span>/<span class="r" id="ol-${sym}">0</span></span>
             </div>
             <div class="sym-chips" id="oc-${sym}"><span class="chip-empty">empty</span></div>
@@ -581,8 +587,7 @@ function buildSymCards() {
           <div class="sym-side even">
             <div class="sym-side-title">DIGITEVEN <span id="ep-${sym}"></span></div>
             <div class="sym-side-stats">
-              <span>Stake</span><span>W / L</span>
-              <span class="sym-side-stake" id="es-${sym}">${initStake.toFixed(2)}</span>
+              <span>W / L</span>
               <span><span class="g" id="ew-${sym}">0</span>/<span class="r" id="el-${sym}">0</span></span>
             </div>
             <div class="sym-chips" id="ec-${sym}"><span class="chip-empty">empty</span></div>
@@ -1096,6 +1101,10 @@ function onTick(msg) {
 
   if (botState!=='running') return;
 
+  // Clear per-tick guard for this symbol so new placements are allowed this tick
+  placedThisTick.delete(sym+':EVEN');
+  placedThisTick.delete(sym+':ODD');
+
   readSettings();
   recomputeThresholdDigits(sym);
 
@@ -1128,10 +1137,14 @@ function onBuy(msg) {
 function placeSide(sym, side) {
   if (botState!=='running') return;
   if (balance===null) return;
+  // Per-tick guard: one contract per symbol+type per tick
+  const tickKey = sym+':'+side;
+  if (placedThisTick.has(tickKey)) return;
+  placedThisTick.add(tickKey);
+
   readSettings();
   const s = S[sym];
-  const list = side==='ODD' ? s.oddList : s.evenList;
-  const stake = +(calcStake(list).toFixed(2));
+  const stake = +(calcStake(globalLossList).toFixed(2));
   if (stake>balance) { alert2('Insufficient balance for '+sym+' '+side+'. Bot paused.'); pauseBot(); return; }
   const contractType = side==='ODD' ? 'DIGITODD' : 'DIGITEVEN';
   const rid = nextRid();
@@ -1139,7 +1152,7 @@ function placeSide(sym, side) {
     const pendObj = {cid, stake, settled:false};
     if (side==='ODD')  { s.pendingOdd=pendObj;  g('op-'+sym).innerHTML='<span class="pend-dot"></span>'; }
     else               { s.pendingEven=pendObj; g('ep-'+sym).innerHTML='<span class="pend-dot"></span>'; }
-    s.cidSide[cid]=side; s.cidStake[cid]=stake; s.cidPrediction[cid]=null;
+    s.cidSide[cid]=side; s.cidStake[cid]=stake; s.cidPrediction[cid]=null; s.cidRemoved[cid]=null;
     addLog('['+sym+'] ✓ '+contractType+' bought #'+cid+' stake='+stake.toFixed(2),'ok');
   };
   wsSendBuy(sym, contractType, stake, rid);
@@ -1171,15 +1184,51 @@ function predetermineResult(sym, side, won, digit) {
   s.symPL=parseFloat((s.symPL+profit).toFixed(2));
   updateBotDD();
   if (side==='ODD') {
-    if (won){ s.oddW++; wins++; s.oddList.splice(0,5); addLog('[PRE]['+sym+'] ✓ DIGITODD WIN  (digit='+digit+') profit=+'+profit.toFixed(2)+' | list remaining='+s.oddList.length,'ok'); addHistory(sym,'ODD','WIN',stake,stake+profit,profit,true); }
-    else    { s.oddL++; losses++; s.oddList.push(stake); addLog('[PRE]['+sym+'] ✗ DIGITODD LOSS (digit='+digit+') net='+profit.toFixed(2),'err'); addHistory(sym,'ODD','LOSS',stake,0,profit,true); }
+    if (won){
+      s.oddW++; wins++;
+      const { removed, newList } = applyWin(stake);
+      globalLossList = newList;
+      if (pend.cid) s.cidRemoved[pend.cid] = removed;
+      addLog('[PRE]['+sym+'] ✓ DIGITODD WIN  (digit='+digit+') profit=+'+profit.toFixed(2)+' removed='+removed.length+' from global list','ok');
+      addHistory(sym,'ODD','WIN',stake,stake+profit,profit,true);
+    } else {
+      s.oddL++; losses++;
+      globalLossList.push(stake);
+      addLog('[PRE]['+sym+'] ✗ DIGITODD LOSS (digit='+digit+') net='+profit.toFixed(2)+' globalList.len='+globalLossList.length,'err');
+      addHistory(sym,'ODD','LOSS',stake,0,profit,true);
+    }
     g('op-'+sym).innerHTML=''; s.pendingOdd=null;
   } else {
-    if (won){ s.evenW++; wins++; s.evenList.splice(0,5); addLog('[PRE]['+sym+'] ✓ DIGITEVEN WIN  (digit='+digit+') profit=+'+profit.toFixed(2)+' | list remaining='+s.evenList.length,'ok'); addHistory(sym,'EVEN','WIN',stake,stake+profit,profit,true); }
-    else    { s.evenL++; losses++; s.evenList.push(stake); addLog('[PRE]['+sym+'] ✗ DIGITEVEN LOSS (digit='+digit+') net='+profit.toFixed(2),'err'); addHistory(sym,'EVEN','LOSS',stake,0,profit,true); }
+    if (won){
+      s.evenW++; wins++;
+      const { removed, newList } = applyWin(stake);
+      globalLossList = newList;
+      if (pend.cid) s.cidRemoved[pend.cid] = removed;
+      addLog('[PRE]['+sym+'] ✓ DIGITEVEN WIN  (digit='+digit+') profit=+'+profit.toFixed(2)+' removed='+removed.length+' from global list','ok');
+      addHistory(sym,'EVEN','WIN',stake,stake+profit,profit,true);
+    } else {
+      s.evenL++; losses++;
+      globalLossList.push(stake);
+      addLog('[PRE]['+sym+'] ✗ DIGITEVEN LOSS (digit='+digit+') net='+profit.toFixed(2)+' globalList.len='+globalLossList.length,'err');
+      addHistory(sym,'EVEN','LOSS',stake,0,profit,true);
+    }
     g('ep-'+sym).innerHTML=''; s.pendingEven=null;
   }
   updateSymSides(sym); updateKPIs(); checkTPSL();
+}
+
+// Remove up to 5 oldest entries from globalLossList that are strictly < winStake
+function applyWin(winStake) {
+  const removed = [];
+  const newList = [];
+  for (let i = 0; i < globalLossList.length; i++) {
+    if (removed.length < 5 && globalLossList[i] < winStake) {
+      removed.push(globalLossList[i]);
+    } else {
+      newList.push(globalLossList[i]);
+    }
+  }
+  return { removed, newList };
 }
 
 // ── Official settlement ───────────────────────────────────────────────────────
@@ -1198,7 +1247,7 @@ function onTransaction(msg) {
     const pred=s.cidPrediction[cid];
     if (pred!==undefined&&pred!==null&&pred!==won) {
       addLog('⚠ ['+sym+'] Deriv contradicts prediction for '+side+' #'+cid+'. Revising…','warn');
-      reviseResult(sym,side,stakeR,won);
+      reviseResult(sym,side,stakeR,won,cid);
     } else {
       addLog('✓ ['+sym+'] Deriv confirmed '+side+' #'+cid+' '+(won?'WIN':'LOSS')+' payout='+payout.toFixed(2),'ok');
     }
@@ -1222,7 +1271,7 @@ function onPOC(msg) {
     const pred=s.cidPrediction[cid];
     if (pred!==undefined&&pred!==null&&pred!==won){
       addLog('⚠ ['+sym+'] POC contradicts prediction for '+side+' #'+cid+'. Revising…','warn');
-      reviseResult(sym,side,stakeR,won);
+      reviseResult(sym,side,stakeR,won,cid);
     }
     delete s.cidSide[cid]; delete s.cidStake[cid]; delete s.cidPrediction[cid];
     s.settledCids.add(cid);
@@ -1230,19 +1279,38 @@ function onPOC(msg) {
   }
 }
 
-function reviseResult(sym, side, stake, won) {
+function reviseResult(sym, side, stake, won, cid) {
   const s=S[sym];
-  const wrongProfit  = won?parseFloat((-stake).toFixed(2)):parseFloat((stake*0.9).toFixed(2));
-  const correctProfit= won?parseFloat((stake*0.9).toFixed(2)):parseFloat((-stake).toFixed(2));
+  // Determine what the pre-determination was (opposite of won)
+  const wasWin = !won; // if Deriv says won=true, pre-determination was LOSS (wrong); vice versa
+  const wrongProfit  = wasWin ? parseFloat((stake*0.9).toFixed(2)) : parseFloat((-stake).toFixed(2));
+  const correctProfit= won    ? parseFloat((stake*0.9).toFixed(2)) : parseFloat((-stake).toFixed(2));
   totalPL=parseFloat((totalPL-wrongProfit+correctProfit).toFixed(2));
   s.symPL=parseFloat((s.symPL-wrongProfit+correctProfit).toFixed(2));
   updateBotDD();
-  if (side==='ODD') {
-    if (won){ s.oddL--; losses--; s.oddW++; wins++; if(s.oddList.length) s.oddList.pop(); }
-    else    { s.oddW--; wins--; s.oddL++; losses++; s.oddList.push(stake); }
-  } else {
-    if (won){ s.evenL--; losses--; s.evenW++; wins++; if(s.evenList.length) s.evenList.pop(); }
-    else    { s.evenW--; wins--; s.evenL++; losses++; s.evenList.push(stake); }
+
+  if (wasWin && !won) {
+    // Was predicted WIN (entries removed) → actually LOSS
+    // Restore removed entries, then push the loss stake
+    const removed = s.cidRemoved[cid] || [];
+    // Re-insert removed entries at front (original positions) then append rest
+    globalLossList = [...removed, ...globalLossList, stake];
+    if (side==='ODD') { s.oddL++; losses++; s.oddW--; wins--; }
+    else              { s.evenL++; losses++; s.evenW--; wins--; }
+    addLog('⚠ ['+sym+'] REVISED WIN→LOSS '+side+' #'+cid+' stake='+stake.toFixed(2)+' restored='+removed.length,'warn');
+    addHistory(sym, side, 'LOSS', stake, 0, correctProfit, false);
+  } else if (!wasWin && won) {
+    // Was predicted LOSS (stake pushed) → actually WIN
+    // Remove the wrongly pushed stake, then apply win removal
+    const idx = globalLossList.lastIndexOf(stake);
+    if (idx !== -1) globalLossList.splice(idx, 1);
+    const { removed, newList } = applyWin(stake);
+    globalLossList = newList;
+    s.cidRemoved[cid] = removed;
+    if (side==='ODD') { s.oddW++; wins++; s.oddL--; losses--; }
+    else              { s.evenW++; wins++; s.evenL--; losses--; }
+    addLog('⚠ ['+sym+'] REVISED LOSS→WIN '+side+' #'+cid+' stake='+stake.toFixed(2)+' removed='+removed.length,'warn');
+    addHistory(sym, side, 'WIN', stake, stake+correctProfit, correctProfit, false);
   }
   updateSymSides(sym); updateKPIs(); checkTPSL();
 }
@@ -1279,11 +1347,14 @@ function readSettings() {
 function doStart() {
   SYMBOLS.forEach(sym=>{
     const s=S[sym];
-    s.oddList=[]; s.evenList=[]; s.oddW=0; s.oddL=0; s.evenW=0; s.evenL=0;
+    s.oddW=0; s.oddL=0; s.evenW=0; s.evenL=0;
     s.pendingOdd=null; s.pendingEven=null; s.settledCids.clear();
     s.symPL=0;
     g('op-'+sym).innerHTML=''; g('ep-'+sym).innerHTML='';
   });
+  // Reset single global loss list and per-tick guard
+  globalLossList = [];
+  placedThisTick.clear();
   wins=0; losses=0; totalPL=0; maxDD=0; startBal=balance;
   readSettings(); hideAlert(); updateKPIs(); lockCfg(true);
   startSessionTimer();
@@ -1315,6 +1386,7 @@ function doPause() {
 }
 function pauseBot() {
   setStatus('paused'); addLog('Bot PAUSED.','warn');
+  placedThisTick.clear();
   SYMBOLS.forEach(sym=>{
     S[sym].pendingOdd=null; S[sym].pendingEven=null;
     g('op-'+sym).innerHTML=''; g('ep-'+sym).innerHTML='';
@@ -1324,6 +1396,7 @@ function pauseBot() {
 function doStop() {
   if (reconnectTimer){clearTimeout(reconnectTimer);reconnectTimer=null;} reconnectAttempts=0;
   setStatus('stopped');
+  placedThisTick.clear();
   SYMBOLS.forEach(sym=>{
     S[sym].pendingOdd=null; S[sym].pendingEven=null;
     g('op-'+sym).innerHTML=''; g('ep-'+sym).innerHTML='';
@@ -1378,6 +1451,13 @@ function updateKPIs(){
   const wr=g('kWR');
   if(total>0){ const pct=((wins/total)*100).toFixed(1); wr.textContent=pct+'%'; wr.className='kpi-val '+(parseFloat(pct)>=50?'pos':'neg'); }
   else{ wr.textContent='—'; wr.className='kpi-val'; }
+  // Next Stake (global)
+  const ns = calcStake(globalLossList);
+  const nsEl = g('kNextStake');
+  nsEl.textContent = ns.toFixed(2);
+  nsEl.className = 'kpi-val ' + (globalLossList.length > 0 ? 'neg' : 'blue');
+  // Loss List size
+  g('kLossList').textContent = globalLossList.length;
   // TP/SL progress bars
   updateTPSLBars();
   updateOnboarding();
@@ -1449,13 +1529,15 @@ function updateTape(sym, d) {
 
 function updateSymSides(sym){
   const s=S[sym];
-  g('os-'+sym).textContent=calcStake(s.oddList).toFixed(2);
-  g('es-'+sym).textContent=calcStake(s.evenList).toFixed(2);
   g('ow-'+sym).textContent=s.oddW; g('ol-'+sym).textContent=s.oddL;
   g('ew-'+sym).textContent=s.evenW; g('el-'+sym).textContent=s.evenL;
-  // chips
-  const oc=g('oc-'+sym); oc.innerHTML=s.oddList.length?s.oddList.map(v=>'<span class="chip">'+v.toFixed(2)+'</span>').join(''):'<span class="chip-empty">empty</span>';
-  const ec=g('ec-'+sym); ec.innerHTML=s.evenList.length?s.evenList.map(v=>'<span class="chip">'+v.toFixed(2)+'</span>').join(''):'<span class="chip-empty">empty</span>';
+  // chips now show unsettled contract stakes for this symbol
+  const oc=g('oc-'+sym);
+  const oddPending = Object.entries(s.cidSide).filter(([,side])=>side==='ODD').map(([cid])=>s.cidStake[cid]);
+  oc.innerHTML=oddPending.length?oddPending.map(v=>'<span class="chip">'+v.toFixed(2)+'</span>').join(''):'<span class="chip-empty">empty</span>';
+  const ec=g('ec-'+sym);
+  const evenPending = Object.entries(s.cidSide).filter(([,side])=>side==='EVEN').map(([cid])=>s.cidStake[cid]);
+  ec.innerHTML=evenPending.length?evenPending.map(v=>'<span class="chip">'+v.toFixed(2)+'</span>').join(''):'<span class="chip-empty">empty</span>';
   // per-symbol P&L
   const plEl=g('spl-'+sym);
   plEl.textContent=(s.symPL>=0?'+':'')+s.symPL.toFixed(2);
