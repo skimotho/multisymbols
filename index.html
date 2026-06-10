@@ -67,6 +67,13 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .sbadge.stopped::before{background:var(--red);}
 .sbadge.reconnecting{background:rgba(59,130,246,.1);color:var(--accent);border:1px solid var(--accent);}
 .sbadge.reconnecting::before{background:var(--accent);animation:pulse 1s infinite;}
+/* Sim mode badge */
+.sim-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:5px;font-size:10.5px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;font-family:'DM Mono',monospace;background:rgba(245,158,11,.12);color:var(--yellow);border:1px solid var(--yellow);}
+.sim-badge::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--yellow);animation:pulse 1.2s infinite;}
+.real-badge{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:5px;font-size:10.5px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;font-family:'DM Mono',monospace;background:var(--green-bg);color:var(--green);border:1px solid var(--green);}
+.real-badge::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--green);}
+.hist-sim{background:rgba(245,158,11,.1);color:var(--yellow);border:1px solid rgba(245,158,11,.25);border-radius:3px;padding:1px 5px;display:inline-block;font-size:10px;margin-left:3px;}
+.hist-real{background:var(--green-bg);color:var(--green);border:1px solid rgba(34,197,94,.2);border-radius:3px;padding:1px 5px;display:inline-block;font-size:10px;margin-left:3px;}
 /* Control panel (left sidebar) */
 .control-layout{margin-bottom:14px;}
 .panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow-sm);overflow:hidden;display:flex;flex-direction:row;align-items:stretch;min-height:120px;}
@@ -338,6 +345,12 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
       </div>
     </div>
     <div class="kpi">
+      <div class="kpi-label">Trade Mode</div>
+      <div style="margin-top:4px;display:flex;flex-direction:column;gap:4px">
+        <span class="sim-badge" id="modeBadge">SIM</span>
+      </div>
+    </div>
+    <div class="kpi">
       <div class="kpi-label">Status / Time</div>
       <div style="margin-top:4px;display:flex;flex-direction:column;gap:4px">
         <span class="sbadge idle" id="sBadge">IDLE</span>
@@ -374,12 +387,13 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
       <div class="config-section">
         <div class="panel-title" style="margin-bottom:12px">Bot Settings <span style="font-size:9px;color:var(--green);letter-spacing:1px;font-weight:500">&#9679; SHARED</span></div>
         <div class="cfg-grid">
-          <div class="field"><label>Initial Stake</label><input type="number" id="cfgStake" value="0.35" min="0.35" step="0.01"/></div>
+          <div class="field"><label>Initial Stake</label><input type="number" id="cfgStake" value="0.35" min="0.01" step="0.01"/></div>
           <div class="field"><label>Martingale</label><input type="number" id="cfgMF" value="1.3" min="1.01" step="0.01"/></div>
           <div class="field"><label>Take Profit</label><input type="number" id="cfgTP" value="15000" min="0" step="1"/></div>
           <div class="field"><label>Stop Loss</label><input type="number" id="cfgSL" value="50000" min="0" step="1"/></div>
           <div class="field"><label>Threshold</label><input type="number" id="cfgThreshold" value="3" min="1" step="1" title="Min streak count for a digit to qualify as a trigger candidate"/></div>
           <div class="field"><label>Counter</label><input type="number" id="cfgDigitCounter" value="2" min="1" step="1" title="Min number of digits that must be tied at the max streak before a trade triggers"/></div>
+          <div class="field"><label title="Stakes below this threshold go to Sim; at/above go Real">Sim Threshold</label><input type="number" id="cfgSimThreshold" value="0.35" min="0.01" step="0.01" title="Computed stake below this → Simulation. At or above → Real trading."/></div>
         </div>
       </div>
       <div class="btn-row">
@@ -418,11 +432,12 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
               <th style="text-align:left;padding:6px;">Symbol</th>
               <th style="text-align:left;padding:6px;">Type</th>
               <th style="text-align:left;padding:6px;">Stake</th>
-              <th style="text-align:left;padding:6px;">Status</th>
+              <th style="text-align:left;padding:6px;">Result</th>
+              <th style="text-align:left;padding:6px;">Mode</th>
             </tr>
           </thead>
           <tbody id="combinedHistoryBody">
-            <tr><td colspan="5" style="text-align:center;padding:20px;color:var(--text3);">No trades yet</td></tr>
+            <tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text3);">No trades yet</td></tr>
           </tbody>
         </table>
       </div>
@@ -506,6 +521,7 @@ initStates();
 let ws = null, connected = false, authorized = false;
 let botState = 'idle';
 let currency = 'USD', initStake = 0.35, mFactor = 1.3, tpTarget = 15000, slTarget = 50000;
+let simThreshold = 0.35; // Stakes below this go to sim mode
 let triggerThreshold = 3, digitCounterFilter = 2;
 let balance = null, startBal = null, totalPL = 0, maxDD = 0, wins = 0, losses = 0;
 let reconnectAttempts = 0, reconnectTimer = null;
@@ -659,7 +675,7 @@ function clearLog() {
   g('globalLog').innerHTML = '';
 }
 function clearTradeHistory() {
-  g('combinedHistoryBody').innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--text3);">No trades yet</td></tr>';
+  g('combinedHistoryBody').innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text3);">No trades yet</td></tr>';
 }
 
 // ── UI #7: Toast notifications ────────────────────────────────────────────────
@@ -1134,6 +1150,21 @@ function onBuy(msg) {
 }
 
 // ── Place contract ────────────────────────────────────────────────────────────
+function updateModeBadge() {
+  const stake = calcStake(globalLossList);
+  const isSim = stake < simThreshold;
+  const el = g('modeBadge');
+  if (!el) return;
+  if (botState !== 'running' && botState !== 'seeding' && botState !== 'paused') {
+    el.className = 'sim-badge'; el.textContent = 'SIM'; return;
+  }
+  if (isSim) {
+    el.className = 'sim-badge'; el.textContent = 'SIM';
+  } else {
+    el.className = 'real-badge'; el.textContent = 'REAL';
+  }
+}
+
 function placeSide(sym, side) {
   if (botState!=='running') return;
   if (balance===null) return;
@@ -1145,18 +1176,35 @@ function placeSide(sym, side) {
   readSettings();
   const s = S[sym];
   const stake = +(calcStake(globalLossList).toFixed(2));
-  if (stake>balance) { alert2('Insufficient balance for '+sym+' '+side+'. Bot paused.'); pauseBot(); return; }
-  const contractType = side==='ODD' ? 'DIGITODD' : 'DIGITEVEN';
-  const rid = nextRid();
-  s.buyCbs[rid] = (cid) => {
-    const pendObj = {cid, stake, settled:false};
+  const isSim = stake < simThreshold;
+
+  updateModeBadge();
+
+  if (isSim) {
+    // ── SIMULATION MODE ── No real API call; result resolved on next tick
+    const contractType = side==='ODD' ? 'DIGITODD' : 'DIGITEVEN';
+    const simCid = 'SIM_' + Date.now() + '_' + Math.random().toString(36).slice(2,7);
+    const pendObj = {cid: simCid, stake, settled: false, sim: true};
     if (side==='ODD')  { s.pendingOdd=pendObj;  g('op-'+sym).innerHTML='<span class="pend-dot"></span>'; }
     else               { s.pendingEven=pendObj; g('ep-'+sym).innerHTML='<span class="pend-dot"></span>'; }
-    s.cidSide[cid]=side; s.cidStake[cid]=stake; s.cidPrediction[cid]=null; s.cidRemoved[cid]=null;
-    addLog('['+sym+'] ✓ '+contractType+' bought #'+cid+' stake='+stake.toFixed(2),'ok');
-  };
-  wsSendBuy(sym, contractType, stake, rid);
-  updateSymSides(sym);
+    s.cidSide[simCid]=side; s.cidStake[simCid]=stake; s.cidPrediction[simCid]=null; s.cidRemoved[simCid]=null;
+    addLog('[SIM]['+sym+'] '+contractType+' stake='+stake.toFixed(2)+' (below threshold '+simThreshold.toFixed(2)+')','warn');
+    updateSymSides(sym);
+  } else {
+    // ── REAL MODE ──
+    if (stake>balance) { alert2('Insufficient balance for '+sym+' '+side+'. Bot paused.'); pauseBot(); return; }
+    const contractType = side==='ODD' ? 'DIGITODD' : 'DIGITEVEN';
+    const rid = nextRid();
+    s.buyCbs[rid] = (cid) => {
+      const pendObj = {cid, stake, settled:false, sim: false};
+      if (side==='ODD')  { s.pendingOdd=pendObj;  g('op-'+sym).innerHTML='<span class="pend-dot"></span>'; }
+      else               { s.pendingEven=pendObj; g('ep-'+sym).innerHTML='<span class="pend-dot"></span>'; }
+      s.cidSide[cid]=side; s.cidStake[cid]=stake; s.cidPrediction[cid]=null; s.cidRemoved[cid]=null;
+      addLog('[REAL]['+sym+'] ✓ '+contractType+' bought #'+cid+' stake='+stake.toFixed(2),'ok');
+    };
+    wsSendBuy(sym, contractType, stake, rid);
+    updateSymSides(sym);
+  }
 }
 
 function calcStake(list) {
@@ -1179,23 +1227,25 @@ function predetermineResult(sym, side, won, digit) {
   pend.settled=true;
   if (pend.cid) s.cidPrediction[pend.cid]=won;
   const stake=pend.stake;
+  const isSim=!!(pend.sim); // true for sim trades
   const profit=won?parseFloat((stake*0.9).toFixed(2)):parseFloat((-stake).toFixed(2));
   totalPL=parseFloat((totalPL+profit).toFixed(2));
   s.symPL=parseFloat((s.symPL+profit).toFixed(2));
   updateBotDD();
+  const modeTag = isSim ? '[SIM]' : '[REAL]';
   if (side==='ODD') {
     if (won){
       s.oddW++; wins++;
       const { removed, newList } = applyWin(stake);
       globalLossList = newList;
       if (pend.cid) s.cidRemoved[pend.cid] = removed;
-      addLog('[PRE]['+sym+'] ✓ DIGITODD WIN  (digit='+digit+') profit=+'+profit.toFixed(2)+' removed='+removed.length+' from global list','ok');
-      addHistory(sym,'ODD','WIN',stake,stake+profit,profit,true);
+      addLog(modeTag+'[PRE]['+sym+'] ✓ DIGITODD WIN  (digit='+digit+') profit=+'+profit.toFixed(2)+' removed='+removed.length+' from global list','ok');
+      addHistory(sym,'ODD','WIN',stake,stake+profit,profit,true,isSim);
     } else {
       s.oddL++; losses++;
       globalLossList.push(stake);
-      addLog('[PRE]['+sym+'] ✗ DIGITODD LOSS (digit='+digit+') net='+profit.toFixed(2)+' globalList.len='+globalLossList.length,'err');
-      addHistory(sym,'ODD','LOSS',stake,0,profit,true);
+      addLog(modeTag+'[PRE]['+sym+'] ✗ DIGITODD LOSS (digit='+digit+') net='+profit.toFixed(2)+' globalList.len='+globalLossList.length,'err');
+      addHistory(sym,'ODD','LOSS',stake,0,profit,true,isSim);
     }
     g('op-'+sym).innerHTML=''; s.pendingOdd=null;
   } else {
@@ -1204,17 +1254,17 @@ function predetermineResult(sym, side, won, digit) {
       const { removed, newList } = applyWin(stake);
       globalLossList = newList;
       if (pend.cid) s.cidRemoved[pend.cid] = removed;
-      addLog('[PRE]['+sym+'] ✓ DIGITEVEN WIN  (digit='+digit+') profit=+'+profit.toFixed(2)+' removed='+removed.length+' from global list','ok');
-      addHistory(sym,'EVEN','WIN',stake,stake+profit,profit,true);
+      addLog(modeTag+'[PRE]['+sym+'] ✓ DIGITEVEN WIN  (digit='+digit+') profit=+'+profit.toFixed(2)+' removed='+removed.length+' from global list','ok');
+      addHistory(sym,'EVEN','WIN',stake,stake+profit,profit,true,isSim);
     } else {
       s.evenL++; losses++;
       globalLossList.push(stake);
-      addLog('[PRE]['+sym+'] ✗ DIGITEVEN LOSS (digit='+digit+') net='+profit.toFixed(2)+' globalList.len='+globalLossList.length,'err');
-      addHistory(sym,'EVEN','LOSS',stake,0,profit,true);
+      addLog(modeTag+'[PRE]['+sym+'] ✗ DIGITEVEN LOSS (digit='+digit+') net='+profit.toFixed(2)+' globalList.len='+globalLossList.length,'err');
+      addHistory(sym,'EVEN','LOSS',stake,0,profit,true,isSim);
     }
     g('ep-'+sym).innerHTML=''; s.pendingEven=null;
   }
-  updateSymSides(sym); updateKPIs(); checkTPSL();
+  updateSymSides(sym); updateKPIs(); updateModeBadge(); checkTPSL();
 }
 
 // Remove up to 5 oldest entries from globalLossList that are strictly < winStake
@@ -1238,6 +1288,7 @@ function onTransaction(msg) {
   const action=tx.action_type||tx.action||'';
   if (action!=='sell') return;
   const cid=tx.contract_id; if(!cid) return;
+  if (String(cid).startsWith('SIM_')) return; // Sim trades never settle via Deriv
   // Find which symbol owns this cid
   for (const sym of SYMBOLS) {
     const s=S[sym];
@@ -1262,6 +1313,7 @@ function onPOC(msg) {
   if (poc.id) pocSubs[poc.contract_id]=poc.id;
   if (!poc.is_sold&&poc.is_sold!==1) return;
   const cid=poc.contract_id;
+  if (String(cid).startsWith('SIM_')) return; // Sim trades never settle via Deriv
   if (pocSubs[cid]){ wsSend({forget:pocSubs[cid]}); delete pocSubs[cid]; }
   for (const sym of SYMBOLS) {
     const s=S[sym];
@@ -1281,6 +1333,8 @@ function onPOC(msg) {
 
 function reviseResult(sym, side, stake, won, cid) {
   const s=S[sym];
+  // reviseResult only fires for real contracts (sim trades never reach Deriv settlement)
+  const isSim = false;
   // Determine what the pre-determination was (opposite of won)
   const wasWin = !won; // if Deriv says won=true, pre-determination was LOSS (wrong); vice versa
   const wrongProfit  = wasWin ? parseFloat((stake*0.9).toFixed(2)) : parseFloat((-stake).toFixed(2));
@@ -1296,9 +1350,9 @@ function reviseResult(sym, side, stake, won, cid) {
     // Re-insert removed entries at front (original positions) then append rest
     globalLossList = [...removed, ...globalLossList, stake];
     if (side==='ODD') { s.oddL++; losses++; s.oddW--; wins--; }
-    else              { s.evenL++; losses++; s.evenW--; wins--; }
-    addLog('⚠ ['+sym+'] REVISED WIN→LOSS '+side+' #'+cid+' stake='+stake.toFixed(2)+' restored='+removed.length,'warn');
-    addHistory(sym, side, 'LOSS', stake, 0, correctProfit, false);
+    else              { s.evenL++; losses++; s.oddW--; wins--; }
+    addLog('⚠ [REAL]['+sym+'] REVISED WIN→LOSS '+side+' #'+cid+' stake='+stake.toFixed(2)+' restored='+removed.length,'warn');
+    addHistory(sym, side, 'LOSS', stake, 0, correctProfit, false, isSim);
   } else if (!wasWin && won) {
     // Was predicted LOSS (stake pushed) → actually WIN
     // Remove the wrongly pushed stake, then apply win removal
@@ -1309,10 +1363,10 @@ function reviseResult(sym, side, stake, won, cid) {
     s.cidRemoved[cid] = removed;
     if (side==='ODD') { s.oddW++; wins++; s.oddL--; losses--; }
     else              { s.evenW++; wins++; s.evenL--; losses--; }
-    addLog('⚠ ['+sym+'] REVISED LOSS→WIN '+side+' #'+cid+' stake='+stake.toFixed(2)+' removed='+removed.length,'warn');
-    addHistory(sym, side, 'WIN', stake, stake+correctProfit, correctProfit, false);
+    addLog('⚠ [REAL]['+sym+'] REVISED LOSS→WIN '+side+' #'+cid+' stake='+stake.toFixed(2)+' removed='+removed.length,'warn');
+    addHistory(sym, side, 'WIN', stake, stake+correctProfit, correctProfit, false, isSim);
   }
-  updateSymSides(sym); updateKPIs(); checkTPSL();
+  updateSymSides(sym); updateKPIs(); updateModeBadge(); checkTPSL();
 }
 
 function updateBotDD() {
@@ -1326,17 +1380,18 @@ function checkTPSL() {
 
 // ── Settings ──────────────────────────────────────────────────────────────────
 function readSettings() {
-  const prev={initStake,mFactor,tpTarget,slTarget,triggerThreshold,digitCounterFilter};
+  const prev={initStake,mFactor,tpTarget,slTarget,triggerThreshold,digitCounterFilter,simThreshold};
   const _f=(id,def)=>{const v=parseFloat(g(id).value);return isNaN(v)?def:v;};
   const _i=(id,def)=>{const v=parseInt(g(id).value,10);return isNaN(v)?def:v;};
-  initStake=Math.max(0.35,_f('cfgStake',0.35));
+  initStake=Math.max(0.01,_f('cfgStake',0.35));
+  simThreshold=Math.max(0.01,_f('cfgSimThreshold',0.35));
   mFactor=Math.max(1.01,_f('cfgMF',1.3));
   tpTarget=_f('cfgTP',15000);
   slTarget=_f('cfgSL',50000);
   triggerThreshold=Math.max(1,_i('cfgThreshold',3));
   digitCounterFilter=Math.max(1,_i('cfgDigitCounter',2));
   if (botState==='running'||botState==='seeding') {
-    const map=[['cfgStake',initStake,prev.initStake,'Stake'],['cfgMF',mFactor,prev.mFactor,'Martingale'],['cfgTP',tpTarget,prev.tpTarget,'Take Profit'],['cfgSL',slTarget,prev.slTarget,'Stop Loss'],['cfgThreshold',triggerThreshold,prev.triggerThreshold,'Threshold'],['cfgDigitCounter',digitCounterFilter,prev.digitCounterFilter,'Counter Filter']];
+    const map=[['cfgStake',initStake,prev.initStake,'Stake'],['cfgMF',mFactor,prev.mFactor,'Martingale'],['cfgTP',tpTarget,prev.tpTarget,'Take Profit'],['cfgSL',slTarget,prev.slTarget,'Stop Loss'],['cfgThreshold',triggerThreshold,prev.triggerThreshold,'Threshold'],['cfgDigitCounter',digitCounterFilter,prev.digitCounterFilter,'Counter Filter'],['cfgSimThreshold',simThreshold,prev.simThreshold,'Sim Threshold']];
     map.forEach(([id,cur,old,label])=>{
       if (cur!==old){addLog('⚙ Setting changed: '+label+' '+old+' → '+cur,'warn');const el=g(id);el.classList.remove('flashed');void el.offsetWidth;el.classList.add('flashed');}
     });
@@ -1421,7 +1476,7 @@ function refreshBtns(){
   g('btnPause').textContent=botState==='paused'?'Resume':'Pause';
   updateOnboarding();
 }
-function lockCfg(lock){['cfgStake','cfgMF','cfgTP','cfgSL','cfgThreshold','cfgDigitCounter'].forEach(id=>{g(id).disabled=lock;});}
+function lockCfg(lock){['cfgStake','cfgMF','cfgTP','cfgSL','cfgThreshold','cfgDigitCounter','cfgSimThreshold'].forEach(id=>{g(id).disabled=lock;});}
 function alert2(msg,type='error'){
   g('alertIcon').textContent=type==='ok'?'✓':type==='warn'?'ℹ':'⚠';
   g('alertMsg').textContent=msg;
@@ -1460,6 +1515,7 @@ function updateKPIs(){
   g('kLossList').textContent = globalLossList.length;
   // TP/SL progress bars
   updateTPSLBars();
+  updateModeBadge();
   updateOnboarding();
 }
 function updateReadyKPI(){
@@ -1557,11 +1613,12 @@ function updateSymSides(sym){
   } else if(wd){ wd.setAttribute('stroke-dasharray','0 62.83'); if(wdl) wdl.textContent='—'; }
 }
 
-function addHistory(sym,side,result,stake,payout,profit,predicted){
+function addHistory(sym,side,result,stake,payout,profit,predicted,isSim){
   const t=new Date().toTimeString().slice(0,8);
   const tc=side==='ODD'?'hist-type-odd':'hist-type-even';
   const sh=result==='WIN'?'<span class="hist-win">'+(predicted?'~':'')+'WIN</span>':'<span class="hist-loss">'+(predicted?'~':'')+'LOSS</span>';
-  
+  const modeHtml=isSim?'<span class="hist-sim">SIM</span>':'<span class="hist-real">REAL</span>';
+
   // Per-symbol history removed as requested.
 
   // Combined history
@@ -1569,7 +1626,7 @@ function addHistory(sym,side,result,stake,payout,profit,predicted){
   if(combinedTbody){
     if(combinedTbody.innerHTML.includes('No trades yet')) combinedTbody.innerHTML = '';
     const ctr = document.createElement('tr');
-    ctr.innerHTML = '<td style="padding:6px;">'+t+'</td><td style="padding:6px;font-weight:700;color:var(--accent);">'+sym+'</td><td class="'+tc+'" style="padding:6px;">'+side+'</td><td style="padding:6px;">'+stake.toFixed(2)+'</td><td style="padding:6px;">'+sh+'</td>';
+    ctr.innerHTML = '<td style="padding:6px;">'+t+'</td><td style="padding:6px;font-weight:700;color:var(--accent);">'+sym+'</td><td class="'+tc+'" style="padding:6px;">'+side+'</td><td style="padding:6px;">'+stake.toFixed(2)+'</td><td style="padding:6px;">'+sh+'</td><td style="padding:6px;">'+modeHtml+'</td>';
     combinedTbody.insertBefore(ctr, combinedTbody.firstChild);
     while(combinedTbody.rows.length>200) combinedTbody.deleteRow(combinedTbody.rows.length-1);
   }
@@ -1624,7 +1681,7 @@ async function initOAuth(){
 
 initOAuth();
 SYMBOLS.forEach(sym=>{renderSeedUI(sym);renderDigitTable(sym);updateSymSides(sym);});
-updateKPIs(); updateReadyKPI(); refreshBtns(); updateOnboarding();
+updateKPIs(); updateReadyKPI(); refreshBtns(); updateModeBadge(); updateOnboarding();
 </script>
 <div id="toastStack"></div>
 </body>
