@@ -174,6 +174,9 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
 .hist-table td{padding:5px 6px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;border-bottom:1px solid var(--border);}
 .hist-table tr:last-child td{border-bottom:none;}
 .hist-type-odd{color:var(--accent);font-weight:500;}.hist-type-even{color:var(--accent2);font-weight:500;}
+.mode-badge{display:inline-flex;align-items:center;padding:1px 6px;border-radius:4px;font-family:'DM Mono',monospace;font-size:9.5px;font-weight:700;letter-spacing:.8px;white-space:nowrap;}
+.mode-badge.sim{background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.4);color:var(--yellow);}
+.mode-badge.real{background:rgba(59,130,246,.13);border:1px solid rgba(59,130,246,.35);color:var(--accent);}
 .hist-win{background:var(--green-bg);color:var(--green);border:1px solid rgba(34,197,94,.2);border-radius:3px;padding:1px 5px;display:inline-block;font-size:10px;}
 .hist-loss{background:var(--red-bg);color:var(--red);border:1px solid rgba(239,68,68,.2);border-radius:3px;padding:1px 5px;display:inline-block;font-size:10px;}
 .hist-empty{text-align:center;padding:20px 0;color:var(--text3);font-size:11px;}
@@ -433,12 +436,13 @@ body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;fon
               <th style="text-align:left;padding:6px;">Time</th>
               <th style="text-align:left;padding:6px;">Symbol</th>
               <th style="text-align:left;padding:6px;">Type</th>
+              <th style="text-align:left;padding:6px;">Mode</th>
               <th style="text-align:left;padding:6px;">Stake</th>
               <th style="text-align:left;padding:6px;">Status</th>
             </tr>
           </thead>
           <tbody id="combinedHistoryBody">
-            <tr><td colspan="5" style="text-align:center;padding:20px;color:var(--text3);">No trades yet</td></tr>
+            <tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text3);">No trades yet</td></tr>
           </tbody>
         </table>
       </div>
@@ -685,7 +689,7 @@ function clearLog() {
   g('globalLog').innerHTML = '';
 }
 function clearTradeHistory() {
-  g('combinedHistoryBody').innerHTML = '<tr><td colspan="5" style="text-align:center;padding:20px;color:var(--text3);">No trades yet</td></tr>';
+  g('combinedHistoryBody').innerHTML = '<tr><td colspan="6" style="text-align:center;padding:20px;color:var(--text3);">No trades yet</td></tr>';
 }
 
 // ── UI #7: Toast notifications ────────────────────────────────────────────────
@@ -1698,16 +1702,26 @@ function updateSymSides(sym){
 function addHistory(sym,side,result,stake,payout,profit,predicted,isSim){
   const t=new Date().toTimeString().slice(0,8);
   const tc=side==='ODD'?'hist-type-odd':'hist-type-even';
-  const simTag = isSim ? '<span class="hist-sim-tag">SIM</span> ' : '';
-  const sh=result==='WIN'?'<span class="hist-win">'+(predicted?'~':'')+'WIN</span>':'<span class="hist-loss">'+(predicted?'~':'')+'LOSS</span>';
+  const modeBadge = isSim
+    ? '<span class="mode-badge sim">SIM</span>'
+    : '<span class="mode-badge real">REAL</span>';
+  const sh=result==='WIN'
+    ? '<span class="hist-win">'+(predicted?'~':'')+'WIN</span>'
+    : '<span class="hist-loss">'+(predicted?'~':'')+'LOSS</span>';
 
   // Combined history
   const combinedTbody = g('combinedHistoryBody');
   if(combinedTbody){
     if(combinedTbody.innerHTML.includes('No trades yet')) combinedTbody.innerHTML = '';
     const ctr = document.createElement('tr');
-    if(isSim) ctr.style.opacity='0.75';
-    ctr.innerHTML = '<td style="padding:6px;">'+t+'</td><td style="padding:6px;font-weight:700;color:var(--accent);">'+sym+'</td><td class="'+tc+'" style="padding:6px;">'+simTag+side+'</td><td style="padding:6px;">'+stake.toFixed(2)+'</td><td style="padding:6px;">'+sh+'</td>';
+    if(isSim) ctr.style.opacity='0.82';
+    ctr.innerHTML =
+      '<td style="padding:6px;">'+t+'</td>'+
+      '<td style="padding:6px;font-weight:700;color:var(--accent);">'+sym+'</td>'+
+      '<td class="'+tc+'" style="padding:6px;">'+side+'</td>'+
+      '<td style="padding:6px;">'+modeBadge+'</td>'+
+      '<td style="padding:6px;">'+stake.toFixed(2)+'</td>'+
+      '<td style="padding:6px;">'+sh+'</td>';
     combinedTbody.insertBefore(ctr, combinedTbody.firstChild);
     while(combinedTbody.rows.length>200) combinedTbody.deleteRow(combinedTbody.rows.length-1);
   }
